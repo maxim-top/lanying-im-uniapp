@@ -1,7 +1,7 @@
 <template>
 <view>
 <view class="header_view" :style="'padding-top:' + navHeight + 'px'">
-  <image :src="profile.avatar" class="avatar"></image>
+  <image :src="profile.avatar" class="avatar" @tap="changeAvatar"></image>
   <view class="nick">
     <text>{{profile.nick_name || profile.username}}</text>
     <image class="qrcode" src="../../static/pages/image/qrcode.jpg" @tap="goQrcode"></image>
@@ -96,37 +96,70 @@ export default {
       navHeight: getApp().getNavHeight()
     });
 	
-    const im = getApp().getIM();
-    const token = im.userManage.getToken();
-    const app_id = im.userManage.getAppid();
-    im.userManage.asyncGetProfile(true).then(profile => {
-      let avatar = profile.avatar;
-
-      if (avatar) {
-        if (avatar.indexOf('http') !== 0) {
-          avatar = 'https://api.maximtop.com/file/download/avatar?object_name=' + avatar;
-        }
-
-        avatar = avatar + '&image_type=2' + '&access-token=' + token + '&app_id=' + app_id;
-      } else {
-        avatar = "/static/image/roster.png";
-      }
-
-      profile.avatar = avatar; // profile.nick_name = profile.alias || profile.nick_name || profile.username;
-
-      this.setData({
-        profile
-      });
-    });
-    im.on("onDisconnect", () => {// im.userManage.deleteToken();
-      // wx.reLaunch({
-      //   url: '/pages/account/login/index',
-      // })
-    });
+    this.fetchAvatar();
     this.wxAuth();
     this.getIsBind();
   },
   methods: {
+	changeAvatar () {
+	  const that = this;	
+	  uni.chooseImage({
+	      count: 6, //默认9
+	      sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+	      sourceType: ['album'], //从相册选择
+	      success: function (res) {
+			  const file = res.tempFilePaths[0];
+	          console.log("Choose file: ", file);
+			  const im = getApp().getIM();
+			  if( im ){
+				  im.sysManage.asyncFileUpload({
+					  file,
+					  toType: "rosterAvatar"
+				  }).then( res => {
+					  that.updateAvatarUrl(res.url);
+					  console.log("更新头像完成");
+				  }).catch( err => {
+					  console.error("更新头像失败:", err);
+				  })
+			  }
+	      }
+	  });
+	},
+	
+	updateAvatarUrl( avatar ){
+		const that = this;
+		const im = getApp().getIM();
+		im.userManage.asyncUpdateAvatar({avatar})
+		.then(() => {
+			alert("头像已刷新");
+			this.fetchAvatar();
+		});
+	},
+	
+	fetchAvatar() {
+		const im = getApp().getIM();
+		const token = im.userManage.getToken();
+		const app_id = im.userManage.getAppid();
+		im.userManage.asyncGetProfile(true).then(profile => {
+		  let avatar = profile.avatar;
+		
+		  if (avatar) {
+		    if (avatar.indexOf('http') !== 0) {
+		      avatar = 'https://api.maximtop.com/file/download/avatar?object_name=' + avatar;
+		    }
+		
+		    avatar = avatar + '&image_type=2' + '&access-token=' + token + '&app_id=' + app_id;
+		  } else {
+		    avatar = "/static/image/roster.png";
+		  }
+		
+		  profile.avatar = avatar; // profile.nick_name = profile.alias || profile.nick_name || profile.username;
+		  this.setData({
+			  profile
+		  });
+		});
+	},
+	
     bindWechat() {
       if (this.binded) {
         this.unbindHandler();
