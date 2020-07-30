@@ -38,7 +38,6 @@ export default {
 	  }
 	
 	  const im = this.getIM();
-	
 	  if (im && im.login) {
 	    const loginInfo = this.getLoginInfo();
 	
@@ -53,7 +52,9 @@ export default {
 	        user_id: loginInfo.user_id,
 	        password: loginInfo.password
 	      });
-	    }
+	    } else {
+			// do nothing.
+		}
 	  }
 	},
 	
@@ -115,6 +116,80 @@ export default {
 	  wx.removeStorageSync('maxim_logininfo');
 	  wx.reLaunch({
 	    url: '../account/login/index'
+	  });
+	},
+	
+	addIMListeners(){
+	  const im = this.getIM();
+	  if( !im ) return;
+	  
+	  im.on({
+          loginSuccess: this.onLoginSuccess,
+          loginFail: this.onLoginFail,
+          flooNotice: msg => {
+			console.log("Floo Notice: " + msg);
+			const { category, desc } = msg;
+            switch( category ) {
+			  case 'action': 
+			    if( 'relogin' == desc ){
+				  wx.showToast({ title: "请重新登录"});	
+				}else{
+				  console.log("Floo Notice: unknown action ", desc);	
+				}
+                break;
+			  case 'loginMessage':
+				  console.log("IM login message: ", desc);
+				  break;
+              default:
+				console.log("Floo Notice: unknown category " + category);
+			}
+          },
+          flooError: msg => {
+            const { category, desc } = msg;
+            switch( category ) {
+              case 'USER_BANNED':
+				wx.showToast({ title: '用户错误:' + desc });
+                break;
+			  case 'DNS_FAILED':
+			    wx.showToast({ title: "DNS错误: 无法访问 " + desc });
+				break;
+              default:
+                console.log("Floo Error: " + category + " " + desc);
+            }
+          }
+	  });
+	},
+	
+	removeIMListeners(){
+	  const im = this.getIM();
+	  if (im) {
+		im.off('loginSuccess', this.onLoginSuccess);
+	    im.off('loginerror', this.onLoginFail);
+	  }	
+	},
+	
+	onLoginSuccess() {
+	  wx.hideLoading(); //FIXME: chanage tester account
+	
+	  const info = this.getLoginInfo();
+	  const username = info ? info.username : "";
+	
+	  if ('wechat_test' === username) {
+	    // tester ... go work list ...
+	    wx.redirectTo({
+	      url: '/pages/work/list/index'
+	    });
+	  } else {
+	    wx.switchTab({
+	      url: '/pages/contact/index'
+	    });
+	  }
+	},
+	
+	onLoginFail(msg) {
+	  wx.hideLoading();
+	  wx.showToast({
+	    title: '登录出错:' + msg
 	  });
 	},
 	

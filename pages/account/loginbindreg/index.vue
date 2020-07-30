@@ -57,25 +57,15 @@ export default {
     this.setData({
       navHeight: getApp().navH
     });
-    const im = getApp().getIM();
-
-    if (im) {
-      im.on('loginSuccess', this.onLogin);
-      im.on('loginerror', this.onLoginFailure);
-    }
+    getApp().addIMListeners();
   },
 
   onUnload() {
-    const im = getApp().getIM();
-
-    if (im) {
-      im.off('loginSuccess', this.onLogin);
-      im.off('loginerror', this.onLoginFailure);
-    }
+    getApp().removeIMListeners();
   },
 
   onHide() {
-    this.onUnload();
+    getApp().removeIMListeners();
   },
 
   methods: {

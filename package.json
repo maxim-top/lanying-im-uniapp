@@ -25,7 +25,8 @@
   },
   "scripts": {
     "sdk": "webpack --config=webpack.config.js",
-    "release": "yarn sdk && ./floo.sh maxim-uniapp"
+    "release": "yarn sdk && ./floo.sh maxim-uniapp",
+	"package": "cd unpackage/dist/build/ && tar zcvf ../../../maxim-uniapp.tar.gz h5 && cd - "
   },
   "dependencies": {
     "protobufjs": "github:ericliang/protobufjs.wechat",

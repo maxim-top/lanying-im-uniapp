@@ -2,11 +2,14 @@
 
 [美信拓扑](https://www.maximtop.com/)，一键启用多云架构的即时通讯云服务
 
-美信拓扑IM为美信拓扑云服务的DemoApp，方便 App 开发者体验和使用 IM SDK，可以在官网[下载页面](https://www.maximtop.com/downloads/)选择试用所有客户端。
+美信拓扑IM为美信拓扑云服务的DemoApp，方便 App 开发者体验和使用 IM SDK，可以直接[在线试用](https://chat-h5.maximtop.com)，也可以在官网[下载页面](https://www.maximtop.com/downloads/)选择试用所有客户端。
 
-本工程为Uniapp工程，实际上是从[微信小程序](https://github.com/maxim-top/maxim-miniprogram)转换而来，如有问题也可以参照小程序版本。
+## 工程说明
 
-感谢 [DCloud.io](https://dcloud.io) 和 [zhangdaren](https://github.com/zhangdaren/miniprogram-to-uniapp)，转换过程非常顺畅。
+1. 本工程为Uniapp工程，实际上是从[微信小程序](https://github.com/maxim-top/maxim-miniprogram)转换而来，感谢[zhangdaren](https://github.com/zhangdaren/miniprogram-to-uniapp)，转换过程非常顺畅；
+2. 推荐使用此版本进行小程序/H5等版本开发，感谢 [DCloud.io](https://dcloud.io) 开发这么好的框架；
+3. DemoApp是为了演示 IM SDK 调用而开发，也因此最好的开发方式为根据 DemoApp 找到功能，然后直接查看使用示例；
+4. 本工程 DemoApp 不包含所有功能的演示，但是 SDK(floo) 功能完全，高级功能可以参照[PC Web版本](https://github.com/maxim-top/maxim-web)，SDK调用方式是通用的。
 
 此工程共有四个源码目录：
 
@@ -15,7 +18,7 @@
 3. utils 为使用的工具类源码；
 4. third 为第三方源码；
 
-## 开发准备 
+## 准备工作 
 
 1. 运行命令安装依赖包
 

@@ -51,12 +51,7 @@ export default {
       this.onLogin();
       return;
     } else {
-      const im = getApp().getIM();
-
-      if (im) {
-        im.on('loginSuccess', this.onLogin);
-        im.on('loginerror', this.onLoginFailure);
-      }
+      getApp().addIMListeners();
     }
 
 	this.setData({
@@ -65,16 +60,11 @@ export default {
   },
 
   onUnload() {
-    const im = getApp().getIM();
-
-    if (im) {
-      im.off('loginSuccess', this.onLogin);
-      im.off('loginerror', this.onLoginFailure);
-    }
+    getApp().removeIMListeners();
   },
 
   onHide() {
-    this.onUnload();
+    getApp().removeIMListeners();
   },
 
   methods: {
@@ -90,12 +80,7 @@ export default {
         appid: value
       });
       getApp().setupIM(value);
-      const im = getApp().getIM();
-
-      if (im) {
-        im.on('loginSuccess', this.onLogin);
-        im.on('loginerror', this.onLoginFailure);
-      }
+      getApp().addIMListeners();
     },
 
     saveUserInfo(e) {
@@ -165,14 +150,7 @@ export default {
         } else {
           getApp().saveLoginInfo(res);
           getApp().ensureIMLogin();
-          const im = getApp().getIM();
-
-          if (im) {
-            im.on('loginSuccess', this.onLogin);
-            im.on('loginerror', this.onLoginFailure);
-          }
-
-          ;
+          getApp().addIMListeners();
         }
       }).catch(ex => {
         console.log("Wechat login ex: ", ex);
@@ -183,32 +161,7 @@ export default {
         });
       });
     },
-
-    onLogin() {
-      wx.hideLoading(); //FIXME: chanage tester account
-
-      const info = getApp().getLoginInfo();
-      const username = info ? info.username : "";
-
-      if ('wechat_test' === username) {
-        // tester ... go work list ...
-        wx.redirectTo({
-          url: '/pages/work/list/index'
-        });
-      } else {
-        wx.switchTab({
-          url: '/pages/contact/index'
-        });
-      }
-    },
-
-    onLoginFailure(msg) {
-      wx.hideLoading();
-      wx.showToast({
-        title: '登录出错'
-      });
-    },
-
+	
     goLogin() {
       wx.redirectTo({
         url: '../loginpass/index'

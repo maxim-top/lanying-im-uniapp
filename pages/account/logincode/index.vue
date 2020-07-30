@@ -56,30 +56,18 @@ export default {
   onLoad: function () {
     const appid = getApp().getAppid();
     this.setData({
-      appid
+      appid,
+	  navHeight: getApp().navH
     });
-    this.setData({
-      navHeight: getApp().navH
-    });
-    const im = getApp().getIM();
-
-    if (im) {
-      im.on('loginSuccess', this.onLogin);
-      im.on('loginerror', this.onLoginFailure);
-    }
+    getApp().addIMListeners();
   },
 
   onUnload() {
-    const im = getApp().getIM();
-
-    if (im) {
-      im.off('loginSuccess', this.onLogin);
-      im.off('loginerror', this.onLoginFailure);
-    }
+    getApp().removeIMListeners();
   },
 
   onHide() {
-    this.onUnload();
+    getApp().removeIMListeners();
   },
 
   methods: {
@@ -140,18 +128,7 @@ export default {
         appid: value
       });
       getApp().setupIM(value);
-      const im = getApp().getIM();
-
-      if (im) {
-        im.on('loginSuccess', this.onLogin);
-        im.on('loginerror', this.onLoginFailure);
-      }
-    },
-
-    onLogin() {
-      wx.switchTab({
-        url: '/pages/contact/index'
-      });
+      getApp().addIMListeners();
     },
 
     mobileHandler(evt) {
@@ -232,14 +209,6 @@ export default {
         url: '../loginpass/index'
       });
     },
-
-    onLoginFailure(msg) {
-      wx.hideLoading();
-      wx.showToast({
-        title: '登录出错'
-      });
-    }
-
   }
 };
 </script>
