@@ -4,6 +4,9 @@
   <view class="back" @tap.stop="backClick">
     <image class="back_kmg" src="/static/pages/image/back.png"></image>
   </view>
+  <view class="delete_button" @click="deleteConversation()">
+        删除会话
+  </view>
 </snav>
 <view class="container" :style="'padding-top:' + navHeight + 'px'">
   <scroll-view class="contentcontainer" :style="'height:' + wh + 'px'" scroll-y :scroll-top="scrolltop">
@@ -239,6 +242,11 @@ export default {
     backClick() {
       wx.navigateBack();
     },
+	
+	deleteConversation() {
+	  getApp().getIM().deleteConversation(this.uid);
+	  this.backClick();
+	},
 
     voiceHandler() {
       this.setData({

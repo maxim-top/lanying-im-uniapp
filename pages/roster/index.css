@@ -51,3 +51,18 @@
   height:40rpx;
   margin-top: 12rpx;
 }
+
+.delete_button {
+  position: fixed;
+  right: 2px;
+  width: 64px;
+  height: 18px;
+  line-height: 32px;
+  margin-top: -12px;
+  font-size: 12px;
+  color: #319DE1;
+}
+
+.delete_button:hover {
+  color: #880000;
+}

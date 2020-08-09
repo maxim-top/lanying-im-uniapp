@@ -127,8 +127,8 @@ export default {
           loginSuccess: this.onLoginSuccess,
           loginFail: this.onLoginFail,
           flooNotice: msg => {
-			console.log("Floo Notice: " + msg);
 			const { category, desc } = msg;
+			console.log("Floo Notice: " + category + " : " + desc);
             switch( category ) {
 			  case 'action': 
 			    if( 'relogin' == desc ){
