@@ -15,10 +15,10 @@ export default {
   },
 
   onHide() {
-    if (this.getIM().disConnect) {
-      console.log('disconnect onHide ....');
-      this.getIM().disConnect();
-    }
+    // if (this.getIM().disConnect) {
+    //   console.log('disconnect onHide ....');
+    //   this.getIM().disConnect();
+    // }
   },
 
   globalData: {
@@ -37,8 +37,8 @@ export default {
 	    this.initSDK();
 	  }
 	
-	  const im = this.getIM();
-	  if (im && im.login) {
+	  if (!this.isIMLogin()) {
+		const im = this.getIM();
 	    const loginInfo = this.getLoginInfo();
 	
 	    if (loginInfo && loginInfo.username) {
@@ -126,6 +126,10 @@ export default {
 	  im.on({
           loginSuccess: this.onLoginSuccess,
           loginFail: this.onLoginFail,
+		  onMessageRecalled: ({mid}) => {
+			  console.log("消息被撤回：" + mid);
+			  this.deleteMessage(mid);
+		  },
           flooNotice: msg => {
 			const { category, desc } = msg;
 			console.log("Floo Notice: " + category + " : " + desc);
@@ -160,6 +164,36 @@ export default {
 	  });
 	},
 	
+    //如果你在原生App中集成Web版，尤其是Uniapp这样的场景，你才可能需要绑定 DeviceToken 以利用厂商推送通道。
+    //其中 notifier_name 为证书名称，也即在美信拓扑控制台内上传证书时候设置的名称。
+    bindDeviceToken( device_token, notifier_name ){
+      const imUser = this.getIM().userManage;
+      const device_sn = imUser.getDeviceSN();
+      imUser.asyncBindDeviceToken({
+        device_sn,
+        device_token,
+        notifier_name
+      }).then(()=>{
+		wx.showToast({ title: '设备绑定成功:' + device_sn });
+      }).catch( err =>{
+		wx.showToast({ title: '设备绑定失败:' + err.code +":"+err.errMsg });
+      });
+    },
+    unbindDeviceToken( ){
+      const imUser = this.getIM().userManage;
+      const device_sn = imUser.getDeviceSN();
+      imUser.asyncUnbindDeviceToken({
+        deviceSn: device_sn
+      }).then(()=>{
+		wx.showToast({ title: '设备解绑成功:' + device_sn });
+      }).catch( err =>{
+		wx.showToast({ title: '设备解绑失败:' + err.code +":"+err.errMsg });  
+      });
+    },	
+	
+	deleteMessage(mid) {
+      // refresh ui
+	},
 	removeIMListeners(){
 	  const im = this.getIM();
 	  if (im) {
@@ -170,6 +204,8 @@ export default {
 	
 	onLoginSuccess() {
 	  wx.hideLoading(); //FIXME: chanage tester account
+	  
+	  // this.bindDeviceToken( device_token, notifier_name );
 	
 	  const info = this.getLoginInfo();
 	  const username = info ? info.username : "";

@@ -232,7 +232,7 @@ export default {
     },
 
 	deleteConversation() {
-	  getApp().getIM().deleteConversation(this.gid);
+	  getApp().getIM().sysManage.deleteConversation(this.gid, also_delete_other_devices);
 	  this.backClick();
 	},
 	

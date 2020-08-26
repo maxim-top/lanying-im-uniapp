@@ -114,7 +114,7 @@ export default {
       const isHistory = data.history;
       const uid = getApp().getIM().userManage.getUid();
       const oldMessages = this.messages || [];
-      console.log("APPEND message new: ", newMessages);
+      // console.log("APPEND message new: ", newMessages);
       newMessages.forEach(meta => {
         isHistory && (meta.h = true); /////////////////////
 
@@ -244,7 +244,8 @@ export default {
     },
 	
 	deleteConversation() {
-	  getApp().getIM().deleteConversation(this.uid);
+	  const also_delete_other_devices = true;
+	  getApp().getIM().sysManage.deleteConversation(this.uid, also_delete_other_devices);
 	  this.backClick();
 	},
 
