@@ -63,10 +63,6 @@ export default {
     getApp().removeIMListeners();
   },
 
-  onHide() {
-    getApp().removeIMListeners();
-  },
-
   methods: {
     appidTapHandler() {
 	  this.$refs.appidPrompt.show(getApp().getAppid());

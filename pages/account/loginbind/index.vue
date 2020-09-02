@@ -64,10 +64,6 @@ export default {
     getApp().removeIMListeners();
   },
 
-  onHide() {
-    getApp().removeIMListeners();
-  },
-
   methods: {
     bindHandler() {
       //点击登录

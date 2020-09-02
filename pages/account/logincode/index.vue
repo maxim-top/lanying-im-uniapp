@@ -66,10 +66,6 @@ export default {
     getApp().removeIMListeners();
   },
 
-  onHide() {
-    getApp().removeIMListeners();
-  },
-
   methods: {
     sbind() {
       // 点击继续的按钮

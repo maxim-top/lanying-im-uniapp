@@ -67,10 +67,6 @@ export default {
     getApp().removeIMListeners();
   },
 
-  onHide() {
-    getApp().removeIMListeners();
-  },
-
   methods: {
     reg() {
       if (!this.sname || !this.spass) {
