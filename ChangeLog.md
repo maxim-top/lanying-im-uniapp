@@ -3,6 +3,11 @@ Maxim-Uniapp Changelog
  
 [美信拓扑](https://www.maximtop.com/) ，一键启用多云架构的即时通讯云服务
 
+### v2.7.1 20200903
+
+1. 优化重连策略，在网络不稳定情况下冷却重连超时；
+2. Demo：去掉 onHide 里对 listener 的错误移除；
+
 ### v2.7 20200825 七夕快乐
 
 1. 支持删除远程会话；
