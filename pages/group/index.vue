@@ -210,7 +210,8 @@ export default {
       if (content) {
         getApp().getIM().sysManage.sendGroupMessage({
           content,
-          gid: this.gid
+          gid: this.gid,
+		  // ext: "自定义消息字段",
         });
         setTimeout(() => {
           this.setData({
@@ -228,10 +229,17 @@ export default {
     },
 
     backClick() {
-      wx.navigateBack();
+      if( getCurrentPages().length > 1 ){
+      	wx.navigateBack();  
+      }else{
+      	wx.switchTab({
+      	  url: '/pages/contact/index'
+      	});  
+      }
     },
 
 	deleteConversation() {
+	  const also_delete_other_devices = true;	
 	  getApp().getIM().sysManage.deleteConversation(this.gid, also_delete_other_devices);
 	  this.backClick();
 	},

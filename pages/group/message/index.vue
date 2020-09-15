@@ -13,7 +13,9 @@
         <text>{{username}}</text>
       </view>
       <view class="c_content">
-        <text v-if="type == 'text'">{{content}}</text>
+        <text v-if="type == 'text'">{{content}}<br>
+          <text v-if="ext">ext: {{ext}}</text>
+        </text>
         <image class="cimage" v-if="type == 'image'" :src="attachImage"></image>
         <!-- <audio name="音频文件" wx:if="{{type == 'image'}}" author="" src="{{audio}}" class="saudio" controls></audio> -->
         <view class="voice_frmae" v-if="type == 'audio'" @tap="splayAudio">
@@ -41,6 +43,7 @@ export default {
       avatar: '',
       contentType: 0,
       content: '',
+	  ext: '',
       attachImage: '',
       audio: '',
       messageType: 0,
@@ -70,6 +73,7 @@ export default {
     const type = message.type;
     const toType = message.toType;
     let content = message.content || '';
+	let ext = message.ext || '';
     let username = '';
     const umaps = im.rosterManage.getAllRosterDetail();
     const fromUserObj = umaps[from] || {};
@@ -129,6 +133,7 @@ export default {
       type,
       toType,
       content,
+	  ext,
       attachImage: url,
       time,
       from

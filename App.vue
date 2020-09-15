@@ -136,7 +136,11 @@ export default {
             switch( category ) {
 			  case 'action': 
 			    if( 'relogin' == desc ){
-				  wx.showToast({ title: "请重新登录"});	
+				  console.log("Token失效，尝试自动登录中");	
+				  this.ensureIMLogin();
+				}else if( 'relogin_manually' == desc ){
+				  wx.showToast({ title: "请重新登录"});
+				  this.imLogout();
 				}else{
 				  console.log("Floo Notice: unknown action ", desc);	
 				}

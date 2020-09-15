@@ -65,6 +65,12 @@ export default {
     this.setData({
       showing: false
     });
+	
+	const im = getApp().getIM();
+	im && im.off({
+	  'onRosterMessage': '',
+	  'onMessageStatusChanged': '',
+	});
   },
   onLoad: function (options) {
     this.setData({
@@ -89,8 +95,13 @@ export default {
 	  setTimeout(() => {
 	    this.scroll();
 	  }, 500);
-	  im.on("onRosterMessage", message => {
-	    this.receiveNewMessage(message);
+	  im.on({
+		'onRosterMessage': message => {
+			this.receiveNewMessage(message);
+		},
+		'onMessageStatusChanged': ({mid}) => {
+			console.log("Message status changed, mid: ", mid);
+		},
 	  });
 	  im.rosterManage.readRosterMessage(this.uid);
 	}
@@ -222,7 +233,8 @@ export default {
       if (content) {
         getApp().getIM().sysManage.sendRosterMessage({
           content,
-          uid: this.uid
+          uid: this.uid,
+		  // ext: "自定义消息字段",
         });
         setTimeout(() => {
           this.setData({
@@ -240,7 +252,13 @@ export default {
     },
 
     backClick() {
-      wx.navigateBack();
+	  if( getCurrentPages().length > 1 ){
+		wx.navigateBack();  
+	  }else{
+		wx.switchTab({
+		  url: '/pages/contact/index'
+		});  
+	  }
     },
 	
 	deleteConversation() {
