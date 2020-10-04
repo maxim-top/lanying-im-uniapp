@@ -25,7 +25,7 @@ export default {
     im: {},
 	navTop: 24,
     navHeight: 60,
-    dnsServer: "https://dns.maximtop.com/app_dns",
+    // dnsServer: "https://dns.maximtop.com/app_dns",
     appid: "welovemaxim",
     ws: true,
     autoLogin: true
@@ -160,6 +160,9 @@ export default {
                 break;
 			  case 'DNS_FAILED':
 			    wx.showToast({ title: "DNS错误: 无法访问 " + desc });
+				break;
+			  case 'LICENSE':
+			    wx.showToast({ title: "服务需要续费: " + desc });
 				break;
               default:
                 console.log("Floo Error: " + category + " " + desc);
