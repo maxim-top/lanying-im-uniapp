@@ -68,8 +68,9 @@ export default {
 	
 	const im = getApp().getIM();
 	im && im.off({
-	  'onRosterMessage': '',
-	  'onMessageStatusChanged': '',
+	  'onRosterMessage': this.receiveNewMessage,
+	  'onMessageStatusChanged': this.onMessageStatusChanged,
+	  'onSendingMessageStatusChanged': this.onSendingMessageStatusChanged,
 	});
   },
   onLoad: function (options) {
@@ -96,12 +97,9 @@ export default {
 	    this.scroll();
 	  }, 500);
 	  im.on({
-		'onRosterMessage': message => {
-			this.receiveNewMessage(message);
-		},
-		'onMessageStatusChanged': ({mid}) => {
-			console.log("Message status changed, mid: ", mid);
-		},
+		'onRosterMessage': this.receiveNewMessage,
+		'onMessageStatusChanged': this.onMessageStatusChanged,
+		'onSendingMessageStatusChanged': this.onSendingMessageStatusChanged,
 	  });
 	  im.rosterManage.readRosterMessage(this.uid);
 	}
@@ -120,6 +118,13 @@ export default {
     });
   },
   methods: {
+	onMessageStatusChanged: ({mid}) => {
+	  console.log("Message status changed, mid: ", mid);
+	},
+	onSendingMessageStatusChanged: ({status, mid}) => {
+	  console.log("Sending Message status changed to ", status," mid: ", mid);
+	},
+	
     appendMessage: function (data) {
       const newMessages = data.messages || [];
       const isHistory = data.history;

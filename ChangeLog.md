@@ -3,6 +3,10 @@ Maxim-Uniapp Changelog
  
 [美信拓扑](https://www.maximtop.com/) ，一键启用多云架构的即时通讯云服务
 
+### v2.8.1 20201028
+
+1. 增加新的事件通知：发送消息将会有发送中、发送成功和发送失败通知，名称 onSendingMessageStatusChanged
+
 ### v2.8 20200924
 
 1. 适配 v2 DNS服务，支持国外加速节点；

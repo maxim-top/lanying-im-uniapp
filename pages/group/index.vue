@@ -65,6 +65,13 @@ export default {
     this.setData({
       showing: false
     });
+	
+	const im = getApp().getIM();
+	im && im.off({
+	  'onGroupMessage': this.receiveNewMessage,
+	  'onMessageStatusChanged': this.onMessageStatusChanged,
+	  'onSendingMessageStatusChanged': this.onSendingMessageStatusChanged,
+	});
   },
   onLoad: function (options) {
     this.setData({
@@ -88,9 +95,11 @@ export default {
     setTimeout(() => {
       this.scroll();
     }, 500);
-    im.on("onGroupMessage", message => {
-      this.receiveNewMessage(message);
-    });
+	im.on({
+	  'onGroupMessage': this.receiveNewMessage,
+	  'onMessageStatusChanged': this.onMessageStatusChanged,
+	  'onSendingMessageStatusChanged': this.onSendingMessageStatusChanged,
+	});
     im.groupManage.readGroupMessage(this.gid);
     const allGroupMap = im.groupManage.getAllGroupDetail();
     const sgroup = allGroupMap[gid] || {};
@@ -103,6 +112,13 @@ export default {
     });
   },
   methods: {
+	onMessageStatusChanged: ({mid}) => {
+	  console.log("Message status changed, mid: ", mid);
+	},
+	onSendingMessageStatusChanged: ({status, mid}) => {
+	  console.log("Sending Message status changed to ", status," mid: ", mid);
+	},
+	  
     appendMessage: function (data) {
       const newMessages = data.messages || [];
       const isHistory = data.history;
