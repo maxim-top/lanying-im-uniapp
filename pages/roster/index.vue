@@ -4,6 +4,9 @@
   <view class="back" @tap.stop="backClick">
     <image class="back_kmg" src="/static/pages/image/back.png"></image>
   </view>
+  <view class="history_button" @click="queryHistory()">
+        查看历史
+  </view>
   <view class="delete_button" @click="deleteConversation()">
         删除会话
   </view>
@@ -56,7 +59,6 @@ export default {
   },
   props: {},
   onShow: function () {
-    getApp().getIM().rosterManage.readRosterMessage(this.uid);
     this.setData({
       showing: true
     });
@@ -120,6 +122,7 @@ export default {
   methods: {
 	onMessageStatusChanged: ({mid}) => {
 	  console.log("Message status changed, mid: ", mid);
+	  //TODO: refresh page
 	},
 	onSendingMessageStatusChanged: ({status, mid}) => {
 	  console.log("Sending Message status changed to ", status," mid: ", mid);
@@ -265,6 +268,15 @@ export default {
 		});  
 	  }
     },
+	
+	queryHistory() {
+	  const im = getApp().getIM();
+	  if(!im) return;
+	  
+	  const mid = 0; // Query historys older than the message with id:mid, 0 means from the last message;
+	  const amount = 3; // Batch size of one time history message query.
+	  im.sysManage.requireHistoryMessage(this.uid, mid, amount);
+	},
 	
 	deleteConversation() {
 	  const also_delete_other_devices = true;

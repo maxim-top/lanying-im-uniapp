@@ -66,6 +66,13 @@ export default {
 	
 	const im = getApp().getIM();
 	if (im) {
+	  im.on("onUnreadChange", xid => {
+		// xid is either roster_id or group_id 
+	  	console.log("Got notice: onUnreadChange ", xid);  
+		
+		// refresh unread
+		this.getConversationList();
+	  });	
 	  im.on("onRosterMessage", message => {
 	    this.getConversationList();
 	  });

@@ -4,6 +4,9 @@
   <view class="back" @tap.stop="backClick">
     <image class="back_kmg" src="/static/pages/image/back.png"></image>
   </view>
+  <view class="history_button" @click="queryHistory()">
+        查看历史
+  </view>
   <view class="delete_button" @click="deleteConversation()">
         删除会话
   </view>
@@ -59,7 +62,6 @@ export default {
     this.setData({
       showing: false
     });
-    getApp().getIM().groupManage.readGroupMessage(this.gid);
   },
   onUnload: function () {
     this.setData({
@@ -100,7 +102,8 @@ export default {
 	  'onMessageStatusChanged': this.onMessageStatusChanged,
 	  'onSendingMessageStatusChanged': this.onSendingMessageStatusChanged,
 	});
-    im.groupManage.readGroupMessage(this.gid);
+    
+	im.groupManage.readGroupMessage(this.gid);
     const allGroupMap = im.groupManage.getAllGroupDetail();
     const sgroup = allGroupMap[gid] || {};
     this.setData({
@@ -254,6 +257,15 @@ export default {
       }
     },
 
+	queryHistory() {
+	  const im = getApp().getIM();
+	  if(!im) return;
+	  
+	  const mid = 0; // Query historys older than the message with id:mid, 0 means from the last message;
+	  const amount = 3; // Batch size of one time history message query.
+	  im.sysManage.requireHistoryMessage(this.gid, mid, amount);
+	},
+	
 	deleteConversation() {
 	  const also_delete_other_devices = true;	
 	  getApp().getIM().sysManage.deleteConversation(this.gid, also_delete_other_devices);

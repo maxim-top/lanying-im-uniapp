@@ -1,6 +1,11 @@
 <script>
 import flooim from './im/floo-2.0.0.uniapp';
 
+const AUTO_LOGIN_DELAY = 2000; // ms
+const AUTO_LOGIN_TIMES_MAX = 3;
+let autoLoginTimes = 0;
+const INIT_CHECK_TIMES_MAX = 20;
+
 export default {
   onLaunch: function () {
     wx.showShareMenu();
@@ -25,7 +30,7 @@ export default {
     im: {},
 	navTop: 24,
     navHeight: 60,
-    // dnsServer: "https://dns.maximtop.com/app_dns",
+    // dnsServer: "https://dns.maximtop.com/v2/app_dns",
     appid: "welovemaxim",
     ws: true,
     autoLogin: true
@@ -33,14 +38,33 @@ export default {
   
   methods: {
 	ensureIMLogin() {
-	  if ( !(this.getIM() && this.getIM().isLogin) ){
+	  const im = this.getIM();
+	  if ( !(im && im.isReady && im.isReady() ) ){
 	    this.initSDK();
+		this.waitForFlooReadyAndLogin(0);
 	  }
+	},
 	
+	waitForFlooReadyAndLogin( times ){
+	  const im = this.getIM();
+	  //通常来讲，初始化过程会非常快，但由于涉及网络调用，这个时间并无法保证；如果你的业务非常依赖初始化成功，请等待；
+	  if (im && im.isReady && im.isReady()) {
+	  	console.log("flooim 初始化成功 ", times);
+		this.imLogin();
+	  	return;  
+	  }
+	  if(times < INIT_CHECK_TIMES_MAX) {
+		setTimeout(()=> this.waitForFlooReadyAndLogin(times+1), 1000);
+	  }else{
+		console.error("flooim 初始化失败，请重新初始化");  
+	  }
+	},
+	
+	imLogin() {
+	  const im = this.getIM();	
 	  if (!this.isIMLogin()) {
-		const im = this.getIM();
 	    const loginInfo = this.getLoginInfo();
-	
+	  	
 	    if (loginInfo && loginInfo.username) {
 	      im.login({
 	        //TODO: change name to username
@@ -53,11 +77,10 @@ export default {
 	        password: loginInfo.password
 	      });
 	    } else {
-			// do nothing.
-		}
-	  }
+	  			// do nothing.
+	  		}
+	  }	
 	},
-	
 	initSDK() {
 	  const appid = this.getAppid();
 	  const dnsServer = this.globalData.dnsServer;
@@ -71,9 +94,8 @@ export default {
 	    ws
 	  };
 	  const im = flooim(config);
-	
-	  if (im) {
-	    this.globalData.im = im;
+	  if(im) {
+		this.globalData.im = im;
 	  }
 	},
 	
@@ -136,8 +158,18 @@ export default {
             switch( category ) {
 			  case 'action': 
 			    if( 'relogin' == desc ){
-				  console.log("Token失效，尝试自动登录中");	
-				  this.ensureIMLogin();
+				  if( autoLoginTimes >= AUTO_LOGIN_TIMES_MAX ){
+					console.log("自动登录失败次数过多，请手工登录。"); 
+					wx.showToast({ title: "请手工登录"});
+					this.imLogout();
+					autoLoginTimes = 0;
+				  }else {
+					console.log("Token失效，尝试自动登录中:", autoLoginTimes);
+					setTimeout(() => {
+					  this.ensureIMLogin();
+					}, autoLoginTimes*AUTO_LOGIN_DELAY);
+					autoLoginTimes++;
+				  }
 				}else if( 'relogin_manually' == desc ){
 				  wx.showToast({ title: "请重新登录"});
 				  this.imLogout();

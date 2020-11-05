@@ -3,9 +3,17 @@ Maxim-Uniapp Changelog
  
 [美信拓扑](https://www.maximtop.com/) ，一键启用多云架构的即时通讯云服务
 
+### v2.8.2 20201103
+
+1. 增加 SDK 初始化状态判断方法 im.isReady，并增加示例等待 SDK 初始化成功；
+2. 为会话 last message 增加 ext 字段；
+3. 重构 ack 存储，修复事件 onUnreadChange；
+4. Fix bug: 发送者不应该发送 READ_ACK；
+5. 获取历史消息可指定条数：
+
 ### v2.8.1 20201028
 
-1. 增加新的事件通知：发送消息将会有发送中、发送成功和发送失败通知，名称 onSendingMessageStatusChanged
+1. 增加新的事件通知：发送消息将会有发送中、发送成功和发送失败通知，名称 onSendingMessageStatusChanged；
 
 ### v2.8 20200924
 
