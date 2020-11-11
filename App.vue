@@ -41,8 +41,8 @@ export default {
 	  const im = this.getIM();
 	  if ( !(im && im.isReady && im.isReady() ) ){
 	    this.initSDK();
-		this.waitForFlooReadyAndLogin(0);
 	  }
+	  this.waitForFlooReadyAndLogin(0);
 	},
 	
 	waitForFlooReadyAndLogin( times ){
@@ -77,8 +77,8 @@ export default {
 	        password: loginInfo.password
 	      });
 	    } else {
-	  			// do nothing.
-	  		}
+	  	  console.log("没有用户信息不能登录");
+	  	}
 	  }	
 	},
 	initSDK() {
