@@ -3,6 +3,12 @@ Maxim-Uniapp Changelog
  
 [美信拓扑](https://www.maximtop.com/) ，一键启用多云架构的即时通讯云服务
 
+### v2.9.1 20210107
+
+1. 修复私有云文件发送bug；
+2. Demo：显示视频消息；
+3. Demo：小程序群语音支持；
+
 ### v2.8.2 20201103
 
 1. 增加 SDK 初始化状态判断方法 im.isReady，并增加示例等待 SDK 初始化成功；

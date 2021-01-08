@@ -310,8 +310,8 @@ export default {
           recordFile: res.tempFilePath,
           duration: Math.ceil((new Date().getTime() - that.startTime) / 1000)
         });
-        that.preupload(that.recordFile);
-        console.log("录音完成: ", that.recordFile);
+		console.log("录音完成: ", that.recordFile);
+        that.uploadVoice(that.recordFile);
       });
       const options = {
         sampleRate: 44100,
@@ -347,46 +347,21 @@ export default {
       });
     },
 
-    preupload(path) {
-      const that = this;
-      getApp().getIM().sysManage.asyncGetFileUploadChatFileUrl({
-        file_type: 104,
-        to_id: this.uid,
-        to_type: 1
-      }).then(res => {
-        that.uploadVoice(path, res);
-      });
-    },
-
-    uploadVoice(path, param) {
-      const that = this;
+    uploadVoice(path) {
+	  const that = this;
 	  const im = getApp().getIM();
-      const token = im ? im.userManage.getToken() : undefined;
-      wx.uploadFile({
-        url: param.upload_url,
-        filePath: path,
-        name: "file",
-        //后台要绑定的名称
-        header: {
-          "Content-Type": "multipart/form-data",
-          'access-token': token,
-          'app_id': getApp().getAppid()
-        },
-        //参数绑定
-        formData: {
-          OSSAccessKeyId: param.oss_body_param.OSSAccessKeyId,
-          policy: param.oss_body_param.policy,
-          key: param.oss_body_param.key,
-          signature: param.oss_body_param.signature,
-          callback: param.oss_body_param.callback
-        },
-        success: function (res) {
-          that.sendVoiceMessage(param.download_url);
-        },
-        fail: function (ress) {
-          console.log("。。录音保存失败。。");
-        }
-      });
+	  im.sysManage.asyncFileUpload({
+		file: path,
+		to_id: this.uid,
+		fileType: 'audio-mp3',
+		toType: 'chat',
+		chatType: "roster"
+	  }).then( res => {
+		console.log("录音上传成功");  
+		that.sendVoiceMessage(res.url);
+	  }).catch( err => {
+		console.log("录音发送失败："+err);  
+	  });
     },
 
     sendVoiceMessage(url) {

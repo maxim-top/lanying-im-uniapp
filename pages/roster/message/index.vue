@@ -14,6 +14,7 @@
 		  <text v-if="ext">ext: {{ext}}</text>
 		</text>
         <image class="cimage" v-if="type == 'image'" :src="attachImage"></image>
+		<video class="cimage" v-if="type == 'video'" :src="video"></video>
         <!-- <audio name="音频文件" wx:if="{{type == 'audio'}}" author="" src="{{audio}}" class="saudio" controls></audio> -->
         <view class="voice_frmae" v-if="type == 'audio'" @tap="splayAudio">
           <image class="voice" v-if="playing==false" src="/static/pages/image/voice/stop.png"></image>
@@ -43,6 +44,8 @@ export default {
       content: '',
 	  ext: '',
       attachImage: '',
+	  videoCover: '',
+	  video: '',
       messageType: 0,
       time: '',
       playing: false,
@@ -99,6 +102,16 @@ export default {
         avatar: url
       });
     }
+	
+	let videoCover = '';
+	if (url && type === 'video') {
+	  let tUrl = attach.tUrl || '';	
+	  videoCover = im.sysManage.getImage({
+	    avatar: tUrl, 
+		thumbnail: true
+	  });
+	  url = im.sysManage.getChatFile({url});
+	}
 
     if (url && type === 'audio') {
       // 1. use the audio url;
@@ -139,6 +152,8 @@ export default {
       content,
 	  ext,
       attachImage: url,
+	  videoCover,
+	  video: url,
       time,
       from
     });
