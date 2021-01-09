@@ -274,7 +274,7 @@ export default {
 	  if(!im) return;
 	  
 	  const mid = 0; // Query historys older than the message with id:mid, 0 means from the last message;
-	  const amount = 3; // Batch size of one time history message query.
+	  const amount = 20; // Batch size of one time history message query.
 	  im.sysManage.requireHistoryMessage(this.uid, mid, amount);
 	},
 	
