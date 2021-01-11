@@ -1,9 +1,9 @@
 /**index.wxss**/
-.container{
+.container {
   display: block;
   padding: 0 10px;
   margin: 0;
-  padding-top:64px;
+  padding-top: 64px;
 }
 .item {
   height: 120rpx;
@@ -19,7 +19,7 @@
   float: left;
   height: 100rpx;
   line-height: 100rpx;
-  margin-top:10rpx;
+  margin-top: 10rpx;
   margin-left: 15px;
 }
 
@@ -29,11 +29,11 @@
 
 .notify {
   font-size: 24rpx;
-  color: #BBB;
+  color: #bbb;
   text-align: center;
   line-height: 50rpx;
   height: 50rpx;
-  background: #EEE;
+  background: #eee;
   position: fixed;
   top: 0;
   left: 20rpx;

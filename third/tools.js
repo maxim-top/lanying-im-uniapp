@@ -1,6 +1,6 @@
-import Long from "long";
+import Long from 'long';
 
-const formatJson = obj => {
+const formatJson = (obj) => {
   const isLong = obj instanceof Long;
 
   if (isLong) {
@@ -15,7 +15,7 @@ const formatJson = obj => {
 
   if (Array.isArray(obj)) {
     const arrRet = [];
-    obj.forEach(item => {
+    obj.forEach((item) => {
       arrRet.push(formatJson(item));
     });
     return arrRet;
@@ -23,17 +23,14 @@ const formatJson = obj => {
 
   const hashRet = {};
   const keys = Object.keys(obj);
-  keys.forEach(key => {
+  keys.forEach((key) => {
     hashRet[key] = formatJson(obj[key]);
   });
   return hashRet;
 };
 
-const transferToLong = obj => {
-  const {
-    low,
-    high
-  } = obj;
+const transferToLong = (obj) => {
+  const { low, high } = obj;
 
   if (typeof low !== 'undefined' && typeof high !== 'undefined') {
     const srret = new Long(low, high, true);
@@ -48,7 +45,7 @@ const transferToLong = obj => {
 
   if (Array.isArray(obj)) {
     const arrRet = [];
-    obj.forEach(item => {
+    obj.forEach((item) => {
       arrRet.push(transferToLong(item));
     });
     return arrRet;
@@ -56,7 +53,7 @@ const transferToLong = obj => {
 
   const hashRet = {};
   const keys = Object.keys(obj);
-  keys.forEach(key => {
+  keys.forEach((key) => {
     hashRet[key] = transferToLong(obj[key]);
   });
   return hashRet;
@@ -71,24 +68,16 @@ const toNumber = (obj = 0) => {
     return obj;
   }
 
-  const {
-    low,
-    high,
-    unsigned = true
-  } = obj;
+  const { low, high, unsigned = true } = obj;
 
   if (typeof low !== 'undefined' && high !== 'undefined') {
     return new Long(low, high, unsigned).toNumber();
   }
 };
 
-const toLong = obj => {
+const toLong = (obj) => {
   if (typeof obj === 'string') return Long.fromString(obj);
-  const {
-    low,
-    high,
-    unsigned = true
-  } = obj;
+  const { low, high, unsigned = true } = obj;
 
   if (typeof low !== 'undefined' && high !== 'undefined') {
     return new Long(low, high, unsigned);
@@ -101,9 +90,9 @@ const toLong = obj => {
   return new Long();
 };
 
-const numToString = obj => {
+const numToString = (obj) => {
   if (typeof obj === 'undefined') {
-    '';
+    ('');
   }
 
   if (typeof obj === 'string') return obj;
@@ -116,8 +105,8 @@ const numToString = obj => {
   return new Long(obj).toString();
 };
 
-const Uint8ArrayToString = fileData => {
-  var dataString = "";
+const Uint8ArrayToString = (fileData) => {
+  var dataString = '';
 
   for (var i = 0; i < fileData.length; i++) {
     dataString += String.fromCharCode(fileData[i]);
@@ -126,7 +115,7 @@ const Uint8ArrayToString = fileData => {
   return dataString;
 };
 
-const stringToUint8Array = str => {
+const stringToUint8Array = (str) => {
   var arr = [];
 
   for (var i = 0, j = str.length; i < j; ++i) {

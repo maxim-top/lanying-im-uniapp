@@ -1,11 +1,14 @@
 /**index.wxss**/
-.container{
+.container {
   display: block;
   padding: 0 96rpx;
   margin: 0;
 }
 
-.logo {margin-top: 120rpx; text-align: center;}
+.logo {
+  margin-top: 120rpx;
+  text-align: center;
+}
 .logo_image {
   width: 284rpx;
   height: 174rpx;
@@ -14,17 +17,26 @@
 .inputFrame {
   margin-top: 40rpx;
   height: 40rpx;
-  border-bottom: 1rpx solid #EEE;
+  border-bottom: 1rpx solid #eee;
   padding: 20rpx 0;
 }
 
-.inputFrame input{font-size: 28rpx; height: 40rpx;}
+.inputFrame input {
+  font-size: 28rpx;
+  height: 40rpx;
+}
 
-.inputFrame .check_box{width:30rpx; height:30rpx;}
+.inputFrame .check_box {
+  width: 30rpx;
+  height: 30rpx;
+}
 
-.txtFrame { margin-top: 40rpx; height: 40rpx;}
+.txtFrame {
+  margin-top: 40rpx;
+  height: 40rpx;
+}
 
-.txtFrame .bindTxt{
+.txtFrame .bindTxt {
   padding-left: 20rpx;
   font-size: 28rpx;
   color: #666;
@@ -40,22 +52,20 @@
   margin-left: 20rpx;
 }
 .buttonFrame {
-  background: #4FA0FF;
+  background: #4fa0ff;
   height: 81rpx;
   line-height: 81rpx;
-  text-align:center;
-  color:white;
+  text-align: center;
+  color: white;
   font-size: 32rpx;
   border-radius: 7rpx;
-
 }
 .appid_text {
   font-size: 24rpx;
-  color: #AFAFAF ;
+  color: #afafaf;
 }
 
 .getCode {
   float: right;
   font-size: 28rpx;
 }
-

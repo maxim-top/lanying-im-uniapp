@@ -1,33 +1,32 @@
 <template>
-<view>
-<!-- index.wxml -->
-<snav>
-  <view class="back" @tap.stop="backClick">
-    <image class="back_kmg" src="/static/pages/image/back.png"></image>
+  <view>
+    <!-- index.wxml -->
+    <snav>
+      <view class="back" @tap.stop="backClick">
+        <image class="back_kmg" src="/static/pages/image/back.png"></image>
+      </view>
+    </snav>
+    <view class="container" :style="'padding-top:' + navHeight + 'px'">
+      <view class="fs48 mt100">
+        <text>注册并绑定账户</text>
+      </view>
+      <view class="inputFrame">
+        <input :value="sname" type="text" placeholder="用户名" @input="nameHandler" />
+      </view>
+      <view class="inputFrame">
+        <input type="text" :value="spass" password placeholder="密码" @input="passHandler" />
+      </view>
+      <view class="buttonFrame" @tap="bindHandler">
+        <text class="login_btn" type="primary">继续</text>
+      </view>
+      <view class="colorb tc fs28 mt30">
+        <text class @tap="goBind">已有账户，直接绑定</text>
+      </view>
+    </view>
   </view>
-</snav>
-<view class="container" :style="'padding-top:' + navHeight + 'px'">
-  <view class="fs48 mt100">
-    <text>注册并绑定账户</text>
-  </view>
-  <view class="inputFrame">
-    <input :value="sname" type="text" placeholder="用户名" @input="nameHandler"></input>
-  </view>
-  <view class="inputFrame">
-    <input type="text" :value="spass" password placeholder="密码" @input="passHandler"></input>
-  </view>
-  <view class="buttonFrame" @tap="bindHandler">
-    <text class="login_btn" type="primary">继续</text>
-  </view>
-  <view class="colorb tc fs28 mt30">
-    <text class @tap="goBind">已有账户，直接绑定</text>
-  </view>
-</view>
-</view>
 </template>
 
 <script>
-
 export default {
   data() {
     return {
@@ -77,24 +76,27 @@ export default {
           title: '注册中'
         });
         const im = getApp().getIM();
-        im.userManage.asyncRegister({
-          username: this.sname,
-          password: this.spass
-        }).then(() => {
-          wx.showLoading({
-            title: '登录中'
-          });
-          getApp().saveLoginInfo({
+        im.userManage
+          .asyncRegister({
             username: this.sname,
             password: this.spass
+          })
+          .then(() => {
+            wx.showLoading({
+              title: '登录中'
+            });
+            getApp().saveLoginInfo({
+              username: this.sname,
+              password: this.spass
+            });
+            getApp().ensureIMLogin();
+          })
+          .catch((ex) => {
+            wx.hideLoading();
+            wx.showToast({
+              title: '注册失败'
+            });
           });
-          getApp().ensureIMLogin();
-        }).catch(ex => {
-          wx.hideLoading();
-          wx.showToast({
-            title: '注册失败'
-          });
-        });
       }
     },
 
@@ -161,45 +163,52 @@ export default {
       wx.showLoading({
         title: '绑定手机中'
       });
-      getApp().getIM().userManage.asyncUserMobileBindSign({
-        mobile: this.mobile,
-        sign: this.sign
-      }).then(() => {
-        wx.hideLoading();
-        this.goContact();
-      }).catch(ex => {
-        wx.hideLoading();
-        this.goContact();
-      });
+      getApp()
+        .getIM()
+        .userManage.asyncUserMobileBindSign({
+          mobile: this.mobile,
+          sign: this.sign
+        })
+        .then(() => {
+          wx.hideLoading();
+          this.goContact();
+        })
+        .catch((ex) => {
+          wx.hideLoading();
+          this.goContact();
+        });
     },
 
     bindWechat() {
       wx.showLoading({
         title: '绑定微信中'
       });
-      getApp().getIM().sysManage.asyncWxbind({
-        // bind 账号...
-        open_id: this.openId,
-        type: 1
-      }).then(res => {
-        wx.hideLoading();
-        this.goContact();
-      }).catch(ex => {
-        wx.hideLoading();
-        wx.showToast({
-          title: '绑定失败',
-          success: () => {
-            setTimeout(() => {
-              this.goContact();
-            }, 2000);
-          }
+      getApp()
+        .getIM()
+        .sysManage.asyncWxbind({
+          // bind 账号...
+          open_id: this.openId,
+          type: 1
+        })
+        .then((res) => {
+          wx.hideLoading();
+          this.goContact();
+        })
+        .catch((ex) => {
+          wx.hideLoading();
+          wx.showToast({
+            title: '绑定失败',
+            success: () => {
+              setTimeout(() => {
+                this.goContact();
+              }, 2000);
+            }
+          });
         });
-      });
     }
-
   }
 };
 </script>
 <style>
-@import "./index.css";
+@import './index.css';
 </style>

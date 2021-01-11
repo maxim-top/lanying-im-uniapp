@@ -1,46 +1,45 @@
 <template>
-<view>
-<!-- index.wxml -->
-<snav>
-  <view class="back" @tap.stop="backClick">
-    <image class="back_kmg" src="/static/pages/image/back.png"></image>
+  <view>
+    <!-- index.wxml -->
+    <snav>
+      <view class="back" @tap.stop="backClick">
+        <image class="back_kmg" src="/static/pages/image/back.png"></image>
+      </view>
+    </snav>
+    <prompt ref="appidPrompt" title="修改APPID" btn_certain="确定" @confirm="confirm"></prompt>
+    <view class="container" :style="'padding-top:' + navHeight + 'px'">
+      <view @tap="appidTapHandler">
+        <text class="appid_text">APPID：{{ appid }}</text>
+        <image class="edit_logo" src="/static/pages/image/edit.png"></image>
+      </view>
+      <view class="fs48 mt100">
+        <text>密码登录</text>
+      </view>
+      <view class="inputFrame">
+        <input :value="sname" type="text" placeholder="用户名/手机号" @input="nameHandler" />
+      </view>
+      <view class="inputFrame">
+        <input type="text" :value="spass" password placeholder="输入登录密码" @input="passHandler" />
+      </view>
+      <view class="buttonFrame" @tap="bindHandler">
+        <text class="login_btn" type="primary">登录</text>
+      </view>
+      <view class="colorb tc fs28 mt30">
+        <text class="mr20" @tap="goCodeLogin">验证码登录</text>
+        <text class="mr20">|</text>
+        <text @tap="goreg">注册</text>
+      </view>
+    </view>
   </view>
-</snav>
-<prompt ref="appidPrompt" title="修改APPID" btn_certain="确定" @confirm="confirm"></prompt>
-<view class="container" :style="'padding-top:' + navHeight + 'px'">
-  <view @tap="appidTapHandler">
-    <text class="appid_text">APPID：{{appid}}</text>
-    <image class="edit_logo" src="/static/pages/image/edit.png"></image>
-  </view>
-  <view class="fs48 mt100">
-    <text>密码登录</text>
-  </view>
-  <view class="inputFrame">
-    <input :value="sname" type="text" placeholder="用户名/手机号" @input="nameHandler"></input>
-  </view>
-  <view class="inputFrame">
-    <input type="text" :value="spass" password placeholder="输入登录密码" @input="passHandler"></input>
-  </view>
-  <view class="buttonFrame" @tap="bindHandler">
-    <text class="login_btn" type="primary">登录</text>
-  </view>
-  <view class="colorb tc fs28 mt30">
-    <text class="mr20" @tap="goCodeLogin">验证码登录</text>
-    <text class="mr20">|</text>
-    <text @tap="goreg">注册</text>
-  </view>
-</view>
-</view>
 </template>
 
 <script>
-
 export default {
   data() {
     return {
       sname: '',
       spass: '',
-      appid: "",
+      appid: '',
       /////
       ratelOk: false,
       authCode: '',
@@ -54,9 +53,9 @@ export default {
     const appid = getApp().getAppid();
     this.setData({
       appid,
-	  navHeight: getApp().navH
+      navHeight: getApp().navH
     });
-    
+
     getApp().addIMListeners();
   },
 
@@ -85,13 +84,11 @@ export default {
     },
 
     appidTapHandler() {
-	  this.$refs.appidPrompt.show(getApp().getAppid());
+      this.$refs.appidPrompt.show(getApp().getAppid());
     },
 
     confirm(p) {
-      const {
-        value
-      } = p.detail;
+      const { value } = p.detail;
       this.setData({
         ratelOk: false,
         authCode: '',
@@ -116,7 +113,7 @@ export default {
     },
 
     goContact() {
-	  console.log("In Login success");
+      console.log('In Login success');
       wx.switchTab({
         url: '/pages/contact/index'
       });
@@ -138,10 +135,10 @@ export default {
       wx.redirectTo({
         url: '../login/index'
       });
-    },
+    }
   }
 };
 </script>
 <style>
-@import "./index.css";
+@import './index.css';
 </style>

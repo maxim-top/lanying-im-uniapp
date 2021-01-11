@@ -1,10 +1,9 @@
 <template>
-<!--pages/work/sign/index.wxml-->
-<text>pages/work/sign/index.wxml</text>
+  <!--pages/work/sign/index.wxml-->
+  <text>pages/work/sign/index.wxml</text>
 </template>
 
 <script>
-
 export default {
   data() {
     return {};
@@ -56,5 +55,5 @@ export default {
 };
 </script>
 <style>
-@import "./index.css";
+@import './index.css';
 </style>

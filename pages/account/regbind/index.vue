@@ -1,34 +1,33 @@
 <template>
-<view>
-<!-- index.wxml -->
-<snav>
-  <!-- <view class="back" catchtap="backClick">
+  <view>
+    <!-- index.wxml -->
+    <snav>
+      <!-- <view class="back" catchtap="backClick">
     <image class='back_kmg' src="../../image/back.png"></image>
   </view> -->
-</snav>
-<view class="container" :style="'padding-top:' + navHeight + 'px'">
-  <view class="fs48 mt100">
-    <text>绑定手机号</text>
+    </snav>
+    <view class="container" :style="'padding-top:' + navHeight + 'px'">
+      <view class="fs48 mt100">
+        <text>绑定手机号</text>
+      </view>
+      <view class="inputFrame">
+        <input :value="mobile" type="text" placeholder="手机号" @input="mobileHandler" />
+      </view>
+      <view class="inputFrame">
+        <input type="text" style="width: 40%; float: left" :value="code" password placeholder="输入登录密码" @input="codeHandler" />
+        <text class="getCode colorb" style="float: right" @tap="getCode">{{ codeText }}</text>
+      </view>
+      <view class="buttonFrame" @tap="sbind">
+        <text class="login_btn" type="primary">绑定</text>
+      </view>
+      <view class="colorb tc fs28 mt30">
+        <text class="mr20" @tap="goContact">跳过</text>
+      </view>
+    </view>
   </view>
-  <view class="inputFrame">
-    <input :value="mobile" type="text" placeholder="手机号" @input="mobileHandler"></input>
-  </view>
-  <view class="inputFrame">
-    <input type="text" style="width:40%;float:left" :value="code" password placeholder="输入登录密码" @input="codeHandler"></input>
-    <text class="getCode colorb" style="float:right" @tap="getCode">{{codeText}}</text>
-  </view>
-  <view class="buttonFrame" @tap="sbind">
-    <text class="login_btn" type="primary">绑定</text>
-  </view>
-  <view class="colorb tc fs28 mt30">
-    <text class="mr20" @tap="goContact">跳过</text>
-  </view>
-</view>
-</view>
 </template>
 
 <script>
-
 export default {
   data() {
     return {
@@ -58,19 +57,23 @@ export default {
         wx.showLoading({
           title: '绑定中'
         });
-        getApp().getIM().userManage.asyncUserBindMobile({
-          // error message on base/index.js .. needs modify here ..
-          mobile: this.mobile,
-          captcha: this.code
-        }).then(() => {
-          wx.hideLoading();
-          this.goContact();
-        }).catch(ex => {
-          wx.hideLoading();
-          wx.showToast({
-            title: '绑定失败！'
+        getApp()
+          .getIM()
+          .userManage.asyncUserBindMobile({
+            // error message on base/index.js .. needs modify here ..
+            mobile: this.mobile,
+            captcha: this.code
+          })
+          .then(() => {
+            wx.hideLoading();
+            this.goContact();
+          })
+          .catch((ex) => {
+            wx.hideLoading();
+            wx.showToast({
+              title: '绑定失败！'
+            });
           });
-        });
       }
     },
 
@@ -110,21 +113,25 @@ export default {
       wx.showLoading({
         title: '发送中'
       });
-      getApp().getIM().userManage.asyncUserSendSms({
-        // error message on base/index.js .. needs modify here ..
-        mobile: this.mobile
-      }).then(() => {
-        wx.hideLoading();
-        setTimeout(() => {
-          this.stimera();
-        }, 1000);
-      }).catch(ex => {
-        wx.hideLoading();
-        this.setData({
-          timerValue: 0,
-          codeText: '获取验证码'
+      getApp()
+        .getIM()
+        .userManage.asyncUserSendSms({
+          // error message on base/index.js .. needs modify here ..
+          mobile: this.mobile
+        })
+        .then(() => {
+          wx.hideLoading();
+          setTimeout(() => {
+            this.stimera();
+          }, 1000);
+        })
+        .catch((ex) => {
+          wx.hideLoading();
+          this.setData({
+            timerValue: 0,
+            codeText: '获取验证码'
+          });
         });
-      });
     },
 
     stimera() {
@@ -134,7 +141,6 @@ export default {
       if (timerValue == 0) {
         codeText = '获取验证码';
       } // const codeText = '（' + timerValue + '）秒'
-
 
       this.setData({
         timerValue,
@@ -147,10 +153,9 @@ export default {
         }, 1000);
       }
     }
-
   }
 };
 </script>
 <style>
-@import "./index.css";
+@import './index.css';
 </style>

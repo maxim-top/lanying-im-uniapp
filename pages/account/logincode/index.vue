@@ -1,41 +1,40 @@
 <template>
-<view>
-<!-- index.wxml -->
-<snav>
-  <view class="back" @tap.stop="backClick">
-    <image class="back_kmg" src="/static/pages/image/back.png"></image>
+  <view>
+    <!-- index.wxml -->
+    <snav>
+      <view class="back" @tap.stop="backClick">
+        <image class="back_kmg" src="/static/pages/image/back.png"></image>
+      </view>
+    </snav>
+    <prompt ref="appidPrompt" title="修改APPID" btn_certain="确定" @confirm="confirm"></prompt>
+    <view class="container" :style="'padding-top:' + navHeight + 'px'">
+      <view @tap="appidTapHandler">
+        <text class="appid_text">APPID：{{ appid }}</text>
+        <image class="edit_logo" src="/static/pages/image/edit.png"></image>
+      </view>
+      <view class="fs48 mt100">
+        <text>验证码登录</text>
+      </view>
+      <view class="inputFrame">
+        <input :value="mobile" type="text" placeholder="手机号" @input="mobileHandler" />
+      </view>
+      <view class="inputFrame">
+        <input type="text" style="width: 40%; float: left" :value="code" placeholder="输入验证码" @input="codeHandler" />
+        <text class="getCode colorb" style="float: right" @tap="getCode">{{ codeText }}</text>
+      </view>
+      <view class="buttonFrame" @tap="sbind">
+        <text class="login_btn" type="primary">继续</text>
+      </view>
+      <view class="colorb tc fs28 mt30">
+        <text class="mr20" @tap="backClick">密码登录</text>
+        <text class="mr20">|</text>
+        <text @tap="goreg">注册</text>
+      </view>
+    </view>
   </view>
-</snav>
-<prompt ref="appidPrompt" title="修改APPID" btn_certain="确定" @confirm="confirm"></prompt>
-<view class="container" :style="'padding-top:' + navHeight + 'px'">
-  <view @tap="appidTapHandler">
-    <text class="appid_text">APPID：{{appid}}</text>
-    <image class="edit_logo" src="/static/pages/image/edit.png"></image>
-  </view>
-  <view class="fs48 mt100">
-    <text>验证码登录</text>
-  </view>
-  <view class="inputFrame">
-    <input :value="mobile" type="text" placeholder="手机号" @input="mobileHandler"></input>
-  </view>
-  <view class="inputFrame">
-    <input type="text" style="width:40%;float:left" :value="code" placeholder="输入验证码" @input="codeHandler"></input>
-    <text class="getCode colorb" style="float:right" @tap="getCode">{{codeText}}</text>
-  </view>
-  <view class="buttonFrame" @tap="sbind">
-    <text class="login_btn" type="primary">继续</text>
-  </view>
-  <view class="colorb tc fs28 mt30">
-    <text class="mr20" @tap="backClick">密码登录</text>
-    <text class="mr20">|</text>
-    <text @tap="goreg">注册</text>
-  </view>
-</view>
-</view>
 </template>
 
 <script>
-
 export default {
   data() {
     return {
@@ -45,9 +44,9 @@ export default {
       codeText: '获取验证码',
       timerValue: 0,
       openId: '',
-      appid: "",
+      appid: '',
       ratelOk: false,
-      authCode: ""
+      authCode: ''
     };
   },
 
@@ -57,7 +56,7 @@ export default {
     const appid = getApp().getAppid();
     this.setData({
       appid,
-	  navHeight: getApp().navH
+      navHeight: getApp().navH
     });
     getApp().addIMListeners();
   },
@@ -87,37 +86,38 @@ export default {
        *  没有则跳转到 注册并绑定
        */
 
-
-      getApp().getIM().userManage.asyncUserMobileLogin({
-        captcha: this.code,
-        mobile: this.mobile
-      }).then(res => {
-        if (res.sign) {
-          wx.redirectTo({
-            url: '../loginbindreg/index?sign=' + res.sign + '&mobile=' + this.mobile
+      getApp()
+        .getIM()
+        .userManage.asyncUserMobileLogin({
+          captcha: this.code,
+          mobile: this.mobile
+        })
+        .then((res) => {
+          if (res.sign) {
+            wx.redirectTo({
+              url: '../loginbindreg/index?sign=' + res.sign + '&mobile=' + this.mobile
+            });
+          } else {
+            getApp().saveLoginInfo({
+              username: res.username,
+              password: res.password
+            });
+            getApp().ensureIMLogin();
+          }
+        })
+        .catch((ex) => {
+          wx.showToast({
+            title: '验证码登录失败'
           });
-        } else {
-          getApp().saveLoginInfo({
-            username: res.username,
-            password: res.password
-          });
-          getApp().ensureIMLogin();
-        }
-      }).catch(ex => {
-        wx.showToast({
-          title: '验证码登录失败'
         });
-      });
     },
 
     appidTapHandler() {
-	  this.$refs.appidPrompt.show(getApp().getAppid());
+      this.$refs.appidPrompt.show(getApp().getAppid());
     },
 
     confirm(p) {
-      const {
-        value
-      } = p.detail;
+      const { value } = p.detail;
       this.setData({
         ratelOk: false,
         authCode: '',
@@ -162,12 +162,16 @@ export default {
       this.setData({
         timerValue: 60
       });
-      getApp().getIM().userManage.asyncUserSendSms({
-        // error message on base/index.js .. needs modify here ..
-        mobile: this.mobile
-      }).then(() => {// wx.hideLoading();
-        // this.goContact();
-      });
+      getApp()
+        .getIM()
+        .userManage.asyncUserSendSms({
+          // error message on base/index.js .. needs modify here ..
+          mobile: this.mobile
+        })
+        .then(() => {
+          // wx.hideLoading();
+          // this.goContact();
+        });
       setTimeout(() => {
         this.stimera();
       }, 1000);
@@ -180,7 +184,6 @@ export default {
       if (timerValue == 0) {
         codeText = '获取验证码';
       } // const codeText = '（' + timerValue + '）秒'
-
 
       this.setData({
         timerValue,
@@ -204,10 +207,10 @@ export default {
       wx.redirectTo({
         url: '../loginpass/index'
       });
-    },
+    }
   }
 };
 </script>
 <style>
-@import "./index.css";
+@import './index.css';
 </style>

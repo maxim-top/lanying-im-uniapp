@@ -1,33 +1,35 @@
 <template>
-<view>
-<snav title="我的二维码">
-  <view class="back" @tap.stop="backClick">
-    <image class="back_kmg" src="/static/pages/image/back.png"></image>
-  </view>
-</snav>
+  <view>
+    <snav title="我的二维码">
+      <view class="back" @tap.stop="backClick">
+        <image class="back_kmg" src="/static/pages/image/back.png"></image>
+      </view>
+    </snav>
 
-<view class="container">
-  <view class="info">
-    <image :src="profile.avatar" class="avatar"></image>
-    <view class="content">
-      <view class="nick"><text>昵称：{{profile.nickname || profile.username}}</text></view>
-      <view class="uid"><text>id：{{profile.user_id}}</text></view>
+    <view class="container">
+      <view class="info">
+        <image :src="profile.avatar" class="avatar"></image>
+        <view class="content">
+          <view class="nick">
+            <text>昵称：{{ profile.nickname || profile.username }}</text>
+          </view>
+          <view class="uid">
+            <text>id：{{ profile.user_id }}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="canvas-box">
+        <canvas style="width: 600rpx; height: 600rpx; background: #f1f1f1" canvas-id="mycanvas"></canvas>
+      </view>
     </view>
   </view>
-
-  <view class="canvas-box">
-    <canvas style="width: 600rpx;height: 600rpx;background:#f1f1f1;" canvas-id="mycanvas"></canvas>
-  </view>
-
-
-</view>
-</view>
 </template>
 
 <script>
 //index.js
 //获取应用实例
-var QR = require("../../../third/qrcode.js");
+var QR = require('../../../third/qrcode.js');
 
 export default {
   data() {
@@ -37,7 +39,7 @@ export default {
       alias: '',
       navHeight: 0,
       profile: {},
-      imagePath: ""
+      imagePath: ''
     };
   },
 
@@ -47,7 +49,7 @@ export default {
     this.setData({
       navHeight: getApp().getNavHeight()
     });
-	
+
     const im = getApp().getIM();
     const uid = im.userManage.getUid();
     const info = {
@@ -58,12 +60,12 @@ export default {
       source: 'wechat'
     };
     const infoStr = JSON.stringify(info);
-    var size = this.setCanvasSize(); //动态设置画布大小 
+    var size = this.setCanvasSize(); //动态设置画布大小
 
-    this.createQrCode(infoStr, "mycanvas", size.w, size.h);
+    this.createQrCode(infoStr, 'mycanvas', size.w, size.h);
     const token = im.userManage.getToken();
     const app_id = im.userManage.getAppid();
-    im.userManage.asyncGetProfile(true).then(profile => {
+    im.userManage.asyncGetProfile(true).then((profile) => {
       let avatar = profile.avatar;
 
       if (avatar) {
@@ -73,7 +75,7 @@ export default {
 
         avatar = avatar + '&image_type=2' + '&access-token=' + token + '&app_id=' + app_id;
       } else {
-        avatar = "/static/pages/image/roster.png";
+        avatar = '/static/pages/image/roster.png';
       }
 
       profile.avatar = avatar; // profile.nick_name = profile.alias || profile.nick_name || profile.username;
@@ -97,7 +99,7 @@ export default {
         size.h = height;
       } catch (e) {
         // Do something when catch error
-        console.log("获取设备信息失败" + e);
+        console.log('获取设备信息失败' + e);
       }
 
       return size;
@@ -127,7 +129,6 @@ export default {
           console.log(tempFilePath);
           that.setData({
             imagePath: tempFilePath // canvasHidden:true
-
           });
         },
         fail: function (res) {
@@ -139,10 +140,9 @@ export default {
     backClick() {
       wx.navigateBack();
     }
-
   }
 };
 </script>
 <style>
-@import "./index.css";
+@import './index.css';
 </style>

@@ -1,7 +1,6 @@
-
 .container {
   display: block;
-  padding:  0 30rpx;
+  padding: 0 30rpx;
   padding-top: 64px;
   /* background: #F7F7F7; */
   padding-bottom: 100rpx;
@@ -9,21 +8,30 @@
   padding-top: 64px;
 }
 
-.logo {margin-top: 220rpx; text-align: center;}
+.logo {
+  margin-top: 220rpx;
+  text-align: center;
+}
 .logo_image {
   width: 284rpx;
   height: 174rpx;
 }
 
-.txtFrame { margin-top: 30rpx; height: 40rpx; font-size: 20rpx; text-align: center; color: #666;}
+.txtFrame {
+  margin-top: 30rpx;
+  height: 40rpx;
+  font-size: 20rpx;
+  text-align: center;
+  color: #666;
+}
 
 .back {
   height: 64rpx;
   width: 120rpx;
 }
-.back .back_kmg{
-  width:40rpx;
-  height:40rpx;
+.back .back_kmg {
+  width: 40rpx;
+  height: 40rpx;
   margin-top: 12rpx;
 }
 

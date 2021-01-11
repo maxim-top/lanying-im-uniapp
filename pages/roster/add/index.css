@@ -2,15 +2,15 @@
   height: 64rpx;
   width: 120rpx;
 }
-.back .back_kmg{
-  width:40rpx;
-  height:40rpx;
+.back .back_kmg {
+  width: 40rpx;
+  height: 40rpx;
   margin-top: 12rpx;
 }
 
-.container{
+.container {
   display: block;
-  padding:  0 30rpx;
+  padding: 0 30rpx;
   padding-top: 64px;
 }
 .item {
@@ -36,7 +36,7 @@
   width: 100%;
   height: 80rpx;
   border-radius: 6rpx;
-  border: 1rpx solid #EEE;
+  border: 1rpx solid #eee;
 }
 
 .inputFrame input {
@@ -60,5 +60,5 @@
 }
 .sblue {
   color: white;
-  background: #4FA0FF;
+  background: #4fa0ff;
 }

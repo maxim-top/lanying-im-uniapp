@@ -1,12 +1,15 @@
-
-.header_view{background: #4FA0FF; height: 346rpx;position: relative;}
+.header_view {
+  background: #4fa0ff;
+  height: 346rpx;
+  position: relative;
+}
 
 .header_view .avatar {
   position: absolute;
   width: 188rpx;
   height: 188rpx;
   border-radius: 94rpx;
-  bottom:-14rpx;
+  bottom: -14rpx;
   right: 64rpx;
   z-index: 99;
 }
@@ -15,16 +18,16 @@
   height: 58rpx;
   line-height: 58rpx;
   font-size: 42rpx;
-  color:white;
+  color: white;
   padding-top: 166rpx;
-  margin-left:74rpx;
+  margin-left: 74rpx;
 }
 
 .header_view .id {
   height: 34rpx;
   line-height: 34rpx;
   font-size: 24rpx;
-  color:white;
+  color: white;
   margin: 12rpx 0 0 74rpx;
 }
 
@@ -42,9 +45,11 @@
   width: 100%;
 }
 
-.nb{border-bottom: none !important;}
+.nb {
+  border-bottom: none !important;
+}
 
-.container .item .sleft{
+.container .item .sleft {
   height: 44rpx;
   line-height: 44rpx;
   margin-top: 31rpx;
@@ -53,7 +58,7 @@
   float: left;
 }
 
-.container .item .sright{
+.container .item .sright {
   height: 44rpx;
   line-height: 44rpx;
   margin-top: 31rpx;
@@ -76,5 +81,5 @@
 }
 .sblue {
   color: white;
-  background: #4FA0FF;
+  background: #4fa0ff;
 }

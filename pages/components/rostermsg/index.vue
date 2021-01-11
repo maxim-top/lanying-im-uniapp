@@ -1,36 +1,31 @@
 <template>
-<!--index.wxml-->
-<view>
-  <view class="time">
-    <text>{{time}}</text>
-  </view>
-  <view class="container">
-    <view :class="cls">
-
-      <view class="rosterInfo">
-        <image class="avatar" :src="avatar"></image>
-        <text class="username">{{username}}</text>
-      </view>
-      <view class="contentFrame">
-        
-        <view class="c_content">
-          <text v-if="type == 'text'">{{content}}</text>
-          <image class="cimage" v-if="type == 'image'" :src="attachImage"></image>
+  <!--index.wxml-->
+  <view>
+    <view class="time">
+      <text>{{ time }}</text>
+    </view>
+    <view class="container">
+      <view :class="cls">
+        <view class="rosterInfo">
+          <image class="avatar" :src="avatar"></image>
+          <text class="username">{{ username }}</text>
+        </view>
+        <view class="contentFrame">
+          <view class="c_content">
+            <text v-if="type == 'text'">{{ content }}</text>
+            <image class="cimage" v-if="type == 'image'" :src="attachImage"></image>
+          </view>
         </view>
       </view>
-      
     </view>
-  
-  
   </view>
-</view>
 </template>
 
 <script>
 //index.js
 //获取应用实例
-import { toNumber, numToString } from "../../../third/tools";
-import moment from "../../../third/moment";
+import { toNumber, numToString } from '../../../third/tools';
+import moment from '../../../third/moment';
 
 export default {
   data() {
@@ -43,8 +38,8 @@ export default {
       attachImage: '',
       messageType: 0,
       time: '',
-      type: "",
-      toType: ""
+      type: '',
+      toType: ''
     };
   },
 
@@ -71,12 +66,12 @@ export default {
     const fromUserObj = umaps[from] || {};
     let avatar = im.sysManage.getImage({
       avatar: fromUserObj.avatar,
-      sdefault: "/static/pages/image/r.png"
+      sdefault: '/static/pages/image/r.png'
     });
-    username = fromUserObj.nick_name || fromUserObj.username || "";
+    username = fromUserObj.nick_name || fromUserObj.username || '';
 
     if (from == uid) {
-      username = "我自己";
+      username = '我自己';
     }
 
     const attach = message.attach || {};
@@ -88,14 +83,12 @@ export default {
       });
     }
 
-    let {
-      timestamp
-    } = message;
+    let { timestamp } = message;
     timestamp = toNumber(timestamp);
-    let time = moment(timestamp).calendar("", {
-      sameDay: "[今天] HH:mm",
-      lastDay: "[昨天] HH:mm",
-      sameElse: "YYYY-MM-DD HH:mm"
+    let time = moment(timestamp).calendar('', {
+      sameDay: '[今天] HH:mm',
+      lastDay: '[昨天] HH:mm',
+      sameElse: 'YYYY-MM-DD HH:mm'
     });
     this.setData({
       cls,
@@ -112,5 +105,5 @@ export default {
 };
 </script>
 <style>
-@import "./index.css";
+@import './index.css';
 </style>
