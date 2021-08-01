@@ -43,21 +43,14 @@ export default {
     this.setData({
       appid
     });
-
-    if (getApp().isIMLogin()) {
-      this.onLogin();
-      return;
-    } else {
-      getApp().addIMListeners();
-    }
-
     this.setData({
       navHeight: getApp().getNavHeight()
     });
-  },
 
-  onUnload() {
-    getApp().removeIMListeners();
+    if (getApp().isIMLogin()) {
+      this.goContact();
+      return;
+    }
   },
 
   methods: {
@@ -154,6 +147,13 @@ export default {
             title: '微信登陆失败' //这里没有code
           });
         });
+    },
+
+    goContact() {
+      console.log('In Login success');
+      wx.switchTab({
+        url: '/pages/contact/index'
+      });
     },
 
     goLogin() {

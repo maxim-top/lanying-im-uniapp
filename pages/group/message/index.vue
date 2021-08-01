@@ -154,6 +154,17 @@ export default {
       from
     });
   },
+  onShow: function () {
+    const im = getApp().getIM();
+    const message = this.message;
+
+    // Message displayed as read
+    const fromUid = toNumber(message.from);
+    const uid = im.userManage.getUid();
+    if (fromUid !== uid && message.status !== 'read') {
+      im.groupManage.readGroupMessage(this.uid, this.message.id);
+    }
+  },
   methods: {
     splayAudio: function () {
       const innerAudioContext = wx.createInnerAudioContext(); // innerAudioContext.autoplay = true

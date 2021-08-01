@@ -19,6 +19,10 @@ export default {
     this.ensureIMLogin();
   },
 
+  onUnload() {
+    this.removeIMListeners();
+  },
+
   onHide() {
     // if (this.getIM().disConnect) {
     //   console.log('disconnect onHide ....');
@@ -31,7 +35,6 @@ export default {
     navTop: 24,
     navHeight: 60,
     // dnsServer: "https://dns.maximtop.com/v2/app_dns",
-    appid: 'welovemaxim',
     ws: true,
     autoLogin: true
   },
@@ -39,8 +42,8 @@ export default {
   methods: {
     ensureIMLogin() {
       const im = this.getIM();
-      if (!(im && im.isReady && im.isReady())) {
-        this.initSDK();
+      if (!(im && im.isReady)) {
+        this.initFlooIM();
       }
       this.waitForFlooReadyAndLogin(0);
     },
@@ -81,7 +84,7 @@ export default {
         }
       }
     },
-    initSDK() {
+    initFlooIM() {
       const appid = this.getAppid();
       const dnsServer = this.globalData.dnsServer;
       const ws = this.globalData.ws;
@@ -94,33 +97,35 @@ export default {
         ws
       };
       const im = flooim(config);
-      if (im) {
-        this.globalData.im = im;
-      }
+      this.globalData.im = im;
+      this.addIMListeners();
     },
 
     getIM() {
       return this.globalData.im;
     },
 
-    getAppid() {
-      return this.globalData.appid;
-    },
-
     setupIM(appid) {
       console.log('Change appid to ', appid);
-      this.globalData.appid = appid;
-      if (this.getIM() && this.getIM().logout) {
-        this.getIM().logout();
-      }
+      this.saveAppid(appid);
 
-      this.globalData.im = {};
+      const im = this.getIM();
+      im && im.logout && im.logout();
+
+      this.globalData.im = null;
       this.ensureIMLogin();
     },
 
     isIMLogin() {
       const im = this.getIM();
       return im && im.isLogin && im.isLogin();
+    },
+
+    saveAppid(appid) {
+      wx.setStorageSync('maxim_appid', appid);
+    },
+    getAppid() {
+      return wx.getStorageSync('maxim_appid') || 'welovemaxim';
     },
 
     saveLoginInfo(info) {
@@ -131,11 +136,14 @@ export default {
       return wx.getStorageSync('maxim_logininfo') || {};
     },
 
+    removeLoginInfo() {
+      wx.removeStorageSync('maxim_logininfo');
+    },
+
     imLogout() {
       const info = this.getLoginInfo();
-      console.log('IM logout: ', info);
       this.getIM().logout();
-      wx.removeStorageSync('maxim_logininfo');
+      this.removeLoginInfo();
       wx.reLaunch({
         url: '../account/login/index'
       });
@@ -177,6 +185,8 @@ export default {
                 console.log('Floo Notice: unknown action ', desc);
               }
               break;
+            case 'userNotice':
+              console.log('Floo Notice: 收到用户/设备通知 : ', desc);
             case 'loginMessage':
               console.log('IM login message: ', desc);
               break;

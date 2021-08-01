@@ -111,7 +111,7 @@ export default {
     const allGroupMap = im.groupManage.getAllGroupDetail();
     const sgroup = allGroupMap[gid] || {};
     this.setData({
-      stitle: sgroup.name || ''
+      stitle: sgroup.name || gid
     });
     const wh = wx.getSystemInfoSync().windowHeight - this.navHeight - 70;
     this.setData({

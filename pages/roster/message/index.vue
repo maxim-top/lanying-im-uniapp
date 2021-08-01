@@ -158,6 +158,19 @@ export default {
       from
     });
   },
+
+  onShow: function () {
+    const im = getApp().getIM();
+    const message = this.message;
+
+    // Message displayed as read
+    const uid = im.userManage.getUid();
+    const fromUid = toNumber(this.message.from);
+    if (fromUid !== uid && message.status !== 'read') {
+      //do not read message sent by oneself
+      im.rosterManage.readRosterMessage(this.uid, message.id);
+    }
+  },
   methods: {
     splayAudio: function () {
       const innerAudioContext = wx.createInnerAudioContext(); // innerAudioContext.autoplay = true
@@ -187,6 +200,18 @@ export default {
         });
       });
       innerAudioContext.play();
+    },
+
+    messageStatus() {
+      const im = getApp().getIM();
+
+      const fromUid = toNumber(this.message.from);
+      const toUid = toNumber(this.message.to);
+      const uid = im.userManage.getUid();
+      const cid = fromUid === uid ? toUid : fromUid;
+
+      // status will be unread / delivered / read
+      return im.sysManage.getMessageStatus(cid, this.message.id);
     },
 
     goUserProfile() {

@@ -112,22 +112,23 @@ export default {
     getConversationList() {
       const im = getApp().getIM();
       const uid = im.userManage.getUid();
-      let list = im.userManage.getConversationList();
-      list = list.filter((x) => x.id !== uid);
+      let convList = im.userManage.getConversationList();
+      convList = convList.filter((x) => x.id !== uid);
       const allGroupMap = im.groupManage.getAllGroupDetail();
       const allRosterMap = im.rosterManage.getAllRosterDetail() || {};
-      const slist = list.map((item, index) => {
+      const convListWithCount = convList.map((item, index) => {
         let name;
         const id = item.id;
         const content = item.content;
+        const timestamp = item.timestamp;
         let avatar = '';
         const unreadCount = item.type == 'roster' ? im.rosterManage.getUnreadCount(id) : im.groupManage.getUnreadCount(id);
         const unread = unreadCount > 0 ? unreadCount : 0;
 
         if (item.type === 'roster') {
           //roster
-          const sroster = allRosterMap[id] || {};
-          name = sroster.nick_name || sroster.username || id;
+          const sroster = allRosterMap[id] || { user_id: id };
+          name = sroster.nick_name || sroster.username || sroster.user_id;
           avatar = im.sysManage.getImage({
             avatar: sroster.avatar,
             sdefault: '/static/pages/image/r.png'
@@ -148,13 +149,18 @@ export default {
           index,
           name,
           content,
+          timestamp,
           avatar,
           unread,
           sid: id
         };
       });
+
+      const sortedConvList = convListWithCount.sort((a, b) => {
+        return a.timestamp < b.timestamp ? 1 : a.timestamp > b.timestamp ? -1 : 0;
+      });
       this.setData({
-        conversationList: [].concat(slist)
+        conversationList: [].concat(sortedConvList)
       });
     }
   }

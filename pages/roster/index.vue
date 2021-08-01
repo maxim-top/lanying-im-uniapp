@@ -106,16 +106,15 @@ export default {
         onMessageStatusChanged: this.onMessageStatusChanged,
         onSendingMessageStatusChanged: this.onSendingMessageStatusChanged
       });
-      im.rosterManage.readRosterMessage(this.uid);
     }
 
     /** 设置title */
 
     const umaps = im.rosterManage.getAllRosterDetail();
-    let fromUserObj = umaps[uid] || {};
+    let fromUserObj = umaps[uid] || { user_id: uid };
     if (uid == 0) fromUserObj.username = '系统通知';
     this.setData({
-      stitle: nick || fromUserObj.nick_name || fromUserObj.username || ''
+      stitle: nick || fromUserObj.nick_name || fromUserObj.username || fromUserObj.user_id
     });
     const wh = wx.getSystemInfoSync().windowHeight - this.navHeight - 70;
     this.setData({
@@ -204,8 +203,9 @@ export default {
         }
       }
 
-      if (this.showing) {
-        im.rosterManage.readRosterMessage(this.uid);
+      if (this.showing && from !== uid) {
+        //do not read message sent by oneself
+        im.rosterManage.readRosterMessage(this.uid, message.id);
       }
     },
 

@@ -4,9 +4,30 @@ Maxim-Uniapp Changelog
 
 [美信拓扑](https://www.maximtop.com/) ，一键启用多云架构的即时通讯云服务
 
+### v2.9.8 20210801
+
+1. Fix Bug: 好友信息更新时间应该使用 onRosterInfoUpdate；
+2. Fix Bug: 使用 SocketTask 解决 WebSocket 连接时丢失 wx.onSocketOpen 事件问题；
+3. Fix Bug: 自动登录未正确设置 isLogin，导致同一用户会出现两次登录；
+4. Demo bug fix：好友信息变化后不再触发花名册更新，后者将会在处理不存在用户时引发循环请求；
+5. Demo: 显示花名册好友昵称；
+6. Demo: 持久化存储 AppID，页面刷新后依然使用上次设置 AppID；
+
+### v2.9.7 20210728
+
+1. Fix Bug: 收到 userNotice 后退出并不再重连；
+2. Demo：增加 userNotice 演示；
+
+### v2.9.5 20210303
+
+1. 限制获取同一 ID 的好友信息频次，一秒内只能发起一次；
+2. Fix bug: 群聊信息默认 status 不应为 UNREAD；
+
 ### v2.9.4 20210112
 
-1. Demo: fix bug 切换 AppID 后 SDK 不初始化；
+1. 支持从服务端获取消息已读未读状态；
+2. 支持发送定位消息，type: location；
+3. Demo: fix bug 切换 AppID 后 SDK 不初始化；
 
 ### v2.9.3 20210111
 
