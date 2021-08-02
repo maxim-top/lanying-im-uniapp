@@ -44,7 +44,8 @@ export default {
     return {
       messages: [],
       gid: 0,
-      scrolltop: 1000,
+      queryHistoryMessageId: 0,
+      scrolltop: -1,
       inputValue: '',
       showing: false,
       stitle: '',
@@ -77,6 +78,7 @@ export default {
     im &&
       im.off({
         onGroupMessage: this.receiveNewMessage,
+        onReceiveHistoryMsg: this.receiveHistoryMsg,
         onMessageStatusChanged: this.onMessageStatusChanged,
         onSendingMessageStatusChanged: this.onSendingMessageStatusChanged
       });
@@ -103,6 +105,7 @@ export default {
     }, 500);
     im.on({
       onGroupMessage: this.receiveNewMessage,
+      onReceiveHistoryMsg: this.receiveHistoryMsg,
       onMessageStatusChanged: this.onMessageStatusChanged,
       onSendingMessageStatusChanged: this.onSendingMessageStatusChanged
     });
@@ -129,54 +132,54 @@ export default {
     appendMessage: function (data) {
       const newMessages = data.messages || [];
       const isHistory = data.history;
+      if (isHistory) {
+        this.queryHistoryMessageId = data.next;
+      }
+      const uid = getApp().getIM().userManage.getUid();
       const oldMessages = this.messages || [];
-      newMessages.forEach((meta) => {
-        isHistory && (meta.h = true);
-        const { to } = meta;
 
-        if (to != this.gid) {
-          return; // rosterchat, 必须有一个id是 sid
+      let allMessages = [];
+      let i = 0,
+        j = 0;
+      while (i < newMessages.length && j < oldMessages.length) {
+        const newMeta = newMessages[i];
+        if (newMeta.ext && newMeta.ext.input_status) {
+          i++;
+          continue;
+        }
+        const toUid = toNumber(newMeta.to);
+        if (toUid + '' !== this.gid + '') {
+          // 群消息 to 是 群 id。。
+          return; //group，to 必须是sid
         }
 
-        if (oldMessages.length > 0) {
-          const firstItem = oldMessages[0];
-          const lastItem = oldMessages[oldMessages.length - 1];
-          const compFirst = toLong(meta.id).comp(firstItem.id || 0);
-          const compLast = toLong(meta.id).comp(lastItem.id || 0);
-
-          if (compFirst === -1) {
-            // 比第一个小
-            oldMessages.unshift(meta);
-          } else if (compLast === 1) {
-            oldMessages.push(meta);
-          } else {
-            let index = -1;
-
-            for (var i = 0; i < oldMessages.length - 2; i += 1) {
-              const compCurr = toLong(meta.id).comp(oldMessages[i].id);
-              const compNext = toLong(meta.id).comp(oldMessages[i + 1].id);
-
-              if (compCurr === 1 && compNext === -1) {
-                index = i;
-              }
-            }
-
-            if (index > -1) {
-              oldMessages.splice(index, 0, meta); // 插入到这里
-            }
-          }
+        const oldMeta = oldMessages[j];
+        const c = toLong(newMeta.id).comp(toLong(oldMeta.id));
+        if (-1 === c) {
+          allMessages.push(newMeta);
+          i++;
+        } else if (1 === c) {
+          allMessages.push(oldMeta);
+          j++;
         } else {
-          // 数组为空
-          oldMessages.push(meta);
+          //same id, which means message info updated
+          allMessages.push(newMeta);
+          i++;
+          j++;
         }
-      }); // context.commit('setMessage', [].concat(oldMessages));
-      // if (!isHistory && oldMessages.length !== state.messages.length) {
-      //   state.scroll = state.scroll + 1;
-      // }
+      }
 
+      if (i < newMessages.length) {
+        allMessages = allMessages.concat(newMessages.slice(i, newMessages.length));
+      }
+
+      if (j < oldMessages.length) {
+        allMessages = allMessages.concat(oldMessages.slice(i, oldMessages.length));
+      }
       this.setData({
-        messages: [].concat(oldMessages)
+        messages: [].concat(allMessages)
       });
+      this.scroll();
     },
 
     receiveNewMessage(message) {
@@ -187,9 +190,7 @@ export default {
       if (pid == to) {
         if (!this.checkTyping(message)) {
           // const smessages = im.groupManage.getGruopMessage(pid - 0);
-          this.appendMessage({
-            messages: [message]
-          });
+          this.appendMessage({ messages: [message] });
           this.scroll();
         }
       }
@@ -197,6 +198,11 @@ export default {
       if (this.showing && im) {
         im.groupManage.readGroupMessage(this.gid);
       }
+    },
+
+    receiveHistoryMsg({ next }) {
+      this.setData({ queryHistoryMessageId: next });
+      this.scroll();
     },
 
     checkTyping(message) {
@@ -219,7 +225,7 @@ export default {
     },
 
     scroll() {
-      const scrolltop = this.scrolltop + this.messages.length * 1000;
+      const scrolltop = this.messages.length * 1000;
       this.setData({
         scrolltop
       });
@@ -263,7 +269,7 @@ export default {
       const im = getApp().getIM();
       if (!im) return;
 
-      const mid = 0; // Query historys older than the message with id:mid, 0 means from the last message;
+      const mid = this.queryHistoryMessageId; // Query historys older than the message with id:mid, 0 means from the last message;
       const amount = 20; // Batch size of one time history message query.
       im.sysManage.requireHistoryMessage(this.gid, mid, amount);
     },

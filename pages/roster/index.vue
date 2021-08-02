@@ -36,7 +36,7 @@
 <script>
 //index.js
 //获取应用实例
-import { toLong } from '../../third/tools';
+import { toLong, toNumber } from '../../third/tools';
 import message from './message/index';
 
 export default {
@@ -44,7 +44,8 @@ export default {
     return {
       messages: [],
       uid: 0,
-      scrolltop: 999999,
+      queryHistoryMessageId: 0,
+      scrolltop: -1,
       inputValue: '',
       showing: false,
       stitle: '',
@@ -77,6 +78,7 @@ export default {
     im &&
       im.off({
         onRosterMessage: this.receiveNewMessage,
+        onReceiveHistoryMsg: this.receiveHistoryMsg,
         onMessageStatusChanged: this.onMessageStatusChanged,
         onSendingMessageStatusChanged: this.onSendingMessageStatusChanged
       });
@@ -103,6 +105,7 @@ export default {
       }, 500);
       im.on({
         onRosterMessage: this.receiveNewMessage,
+        onReceiveHistoryMsg: this.receiveHistoryMsg,
         onMessageStatusChanged: this.onMessageStatusChanged,
         onSendingMessageStatusChanged: this.onSendingMessageStatusChanged
       });
@@ -133,54 +136,54 @@ export default {
     appendMessage: function (data) {
       const newMessages = data.messages || [];
       const isHistory = data.history;
+      if (isHistory) {
+        this.queryHistoryMessageId = data.next;
+      }
       const uid = getApp().getIM().userManage.getUid();
       const oldMessages = this.messages || [];
-      // console.log("APPEND message new: ", newMessages);
-      newMessages.forEach((meta) => {
-        isHistory && (meta.h = true); /////////////////////
 
-        const { from, to } = meta;
-        let saveUid = from == uid ? to : from;
-        if (saveUid == '') saveUid = 0; // empty from means system message
-
+      let allMessages = [];
+      let i = 0,
+        j = 0;
+      while (i < newMessages.length && j < oldMessages.length) {
+        const newMeta = newMessages[i];
+        if (newMeta.ext && newMeta.ext.input_status) {
+          i++;
+          continue;
+        }
+        const { from, to } = newMeta;
+        const fromUid = toNumber(from);
+        const toUid = toNumber(to);
+        let saveUid = fromUid === uid ? toUid : fromUid;
         if (saveUid + '' !== this.uid + '') {
           return; // rosterchat, 必须有一个id是 sid
         }
 
-        if (oldMessages.length > 0) {
-          const firstItem = oldMessages[0];
-          const lastItem = oldMessages[oldMessages.length - 1];
-          const compFirst = toLong(meta.id).comp(toLong(firstItem.id || 0));
-          const compLast = toLong(meta.id).comp(toLong(lastItem.id || 0));
-
-          if (compFirst === -1) {
-            // 比第一个小
-            oldMessages.unshift(meta);
-          } else if (compLast === 1) {
-            oldMessages.push(meta);
-          } else {
-            let index = -1;
-
-            for (var i = 0; i < oldMessages.length - 2; i += 1) {
-              const compCurr = toLong(meta.id).comp(toLong(oldMessages[i].id));
-              const compNext = toLong(meta.id).comp(toLong(oldMessages[i + 1].id));
-
-              if (compCurr === 1 && compNext === -1) {
-                index = i;
-              }
-            }
-
-            if (index > -1) {
-              oldMessages.splice(index, 0, meta); // 插入到这里
-            }
-          }
+        const oldMeta = oldMessages[j];
+        const c = toLong(newMeta.id).comp(toLong(oldMeta.id));
+        if (-1 === c) {
+          allMessages.push(newMeta);
+          i++;
+        } else if (1 === c) {
+          allMessages.push(oldMeta);
+          j++;
         } else {
-          // 数组为空
-          oldMessages.push(meta);
+          //same id, which means message info updated
+          allMessages.push(newMeta);
+          i++;
+          j++;
         }
-      });
+      }
+
+      if (i < newMessages.length) {
+        allMessages = allMessages.concat(newMessages.slice(i, newMessages.length));
+      }
+
+      if (j < oldMessages.length) {
+        allMessages = allMessages.concat(oldMessages.slice(i, oldMessages.length));
+      }
       this.setData({
-        messages: [].concat(oldMessages)
+        messages: [].concat(allMessages)
       });
     },
 
@@ -195,10 +198,10 @@ export default {
 
       if ((uid == to && from == pid) || (uid == from && to == pid)) {
         if (!this.checkTyping(message)) {
-          const smessages = im.rosterManage.getRosterMessageByRid(this.uid - 0);
-          this.appendMessage({
-            messages: smessages
-          });
+          // we might reload all messages because of message operations, which could be message deletion;
+          // const smessages = im.rosterManage.getRosterMessageByRid(this.uid - 0);
+          console.log('Got: ', message);
+          this.appendMessage({ messages: [message] });
           this.scroll();
         }
       }
@@ -207,6 +210,11 @@ export default {
         //do not read message sent by oneself
         im.rosterManage.readRosterMessage(this.uid, message.id);
       }
+    },
+
+    receiveHistoryMsg({ next }) {
+      this.setData({ queryHistoryMessageId: next });
+      this.scroll();
     },
 
     checkTyping(message) {
@@ -221,15 +229,13 @@ export default {
           // this.header.querySelector(".typing").style.display = "inline";
           // this.header.querySelector(".typing").innerHTML = status + "...";
         }
-
         return true;
       }
-
       return false;
     },
 
     scroll() {
-      const scrolltop = this.scrolltop + this.messages.length * 1000;
+      const scrolltop = this.messages.length * 1000;
       this.setData({
         scrolltop
       });
@@ -273,7 +279,8 @@ export default {
       const im = getApp().getIM();
       if (!im) return;
 
-      const mid = 0; // Query historys older than the message with id:mid, 0 means from the last message;
+      // Query historys older than the message with id:mid, 0 means from the last message;
+      const mid = this.queryHistoryMessageId;
       const amount = 20; // Batch size of one time history message query.
       im.sysManage.requireHistoryMessage(this.uid, mid, amount);
     },
