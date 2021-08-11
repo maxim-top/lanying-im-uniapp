@@ -4,6 +4,8 @@
 
 美信拓扑 IM 为美信拓扑云服务的 DemoApp，方便 App 开发者体验和使用 IM SDK，可以直接[在线试用](https://chat-h5.maximtop.com)，也可以在官网[下载页面](https://www.maximtop.com/downloads/)选择试用所有客户端。
 
+[![Scc Count Badge](https://sloc.xyz/github/maxim-top/maxim-uniapp/?category=total&avg-wage=1)](https://github.com/maxim-top/maxim-uniapp/) [![Scc Count Badge](https://sloc.xyz/github/maxim-top/maxim-uniapp/?category=code&avg-wage=1)](https://github.com/maxim-top/maxim-uniapp/)
+
 ## 工程说明
 
 1. 本工程为 Uniapp 工程，实际上是从[微信小程序](https://github.com/maxim-top/maxim-miniprogram)转换而来，感谢[zhangdaren](https://github.com/zhangdaren/miniprogram-to-uniapp)，转换过程非常顺畅；
@@ -22,7 +24,7 @@
 
 1. 运行命令安装依赖包
 
-> npm install
+> `npm install`
 
 2. 美信拓扑 AppID
 
@@ -30,7 +32,7 @@
 
 3. 如果开发小程序，还需修改对应小程序平台的 AppID
 
-如微信小程序，可以打开文件 manifest.json，修改其中的 AppID 为你的小程序在微信后台的 appid。
+如微信小程序，可以打开文件 `manifest.json`，修改其中的 AppID 为你的小程序在微信后台的 appid。
 
 修改以上信息后，可以直接通过 HBuilder（Uniapp IDE）发版了，好好玩吧。
 
