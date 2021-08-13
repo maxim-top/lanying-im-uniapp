@@ -2,7 +2,7 @@
 
 [美信拓扑](https://www.maximtop.com/)，一键启用多云架构的即时通讯云服务
 
-美信拓扑 IM 为美信拓扑云服务的 DemoApp，方便 App 开发者体验和使用 IM SDK，可以直接[在线试用](https://chat-h5.maximtop.com)，也可以在官网[下载页面](https://www.maximtop.com/downloads/)选择试用所有客户端。
+美信拓扑 IM 为美信拓扑云服务的 DemoApp，方便 App 开发者体验和使用 IM SDK，可以直接[在线试用](https://chat-h5.maximtop.com)，或者在官网[下载页面](https://www.maximtop.com/downloads/)选择试用其他客户端。
 
 [![Scc Count Badge](https://sloc.xyz/github/maxim-top/maxim-uniapp/?category=total&avg-wage=1)](https://github.com/maxim-top/maxim-uniapp/) [![Scc Count Badge](https://sloc.xyz/github/maxim-top/maxim-uniapp/?category=code&avg-wage=1)](https://github.com/maxim-top/maxim-uniapp/)
 
@@ -20,20 +20,37 @@
 3. utils 为使用的工具类源码；
 4. third 为第三方源码；
 
-## 准备工作
+## 开发
 
 1. 运行命令安装依赖包
 
 > `npm install`
 
-2. 美信拓扑 AppID
+2. 打开 HBuilder（Uniapp IDE）进行开发
+
+## 开发自己的应用
+
+1. 修改美信拓扑 AppID
 
 打开文件 App.vue, 修改变量 appid，将 "welovemaxim" 改为你的应用 AppID，此 AppID 为在[美信拓扑后台](https://console.maximtop.com/)创建应用后获取。
 
-3. 如果开发小程序，还需修改对应小程序平台的 AppID
+2. 如果开发小程序，还需修改对应小程序平台的 AppID
 
-如微信小程序，可以打开文件 `manifest.json`，修改其中的 AppID 为你的小程序在微信后台的 appid。
+如果是微信小程序，可以打开文件 `manifest.json`，修改其中的 AppID 为你的小程序在微信后台的 appid。
 
-修改以上信息后，可以直接通过 HBuilder（Uniapp IDE）发版了，好好玩吧。
+## 代码风格
+
+代码风格选择的 ESLint + Prettier，基本规则如下：
+
+1. 所有缩进设置为 2 ，包括 Style Sheets 中的各种 css 语言文件、html 文件、JavaScript 文件和其它类型文件。
+2. HTML 文件中 script 标签和 style 标签后的首行代码不缩进。
+3. 函数名和花括号的空格
+   - 函数声明时，函数名后不加括号；
+   - 在函数表达式中 function 后面括号前不加空格；
+   - 花括号中（插值表达式/解构赋值）首尾要增加空格。
+
+Webstorm 设置可参考[这里](https://www.wenyuanblog.com/blogs/webstorm-eslint-prettier-reformat-code.html)。
+
+## 其他
 
 了解更多信息可以阅读[在线文档](https://www.maximtop.com/docs/)，或者在本仓库提问 :)

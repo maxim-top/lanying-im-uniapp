@@ -80,8 +80,8 @@ export default {
     let content = message.content || '';
     let ext = message.ext || '';
     let username = '';
-    const umaps = im.rosterManage.getAllRosterDetail();
-    const fromUserObj = umaps[from] || {};
+    const fromUserObj = im.rosterManage.getRosterInfo(from);
+
     let avatar = im.sysManage.getImage({
       avatar: fromUserObj.avatar,
       sdefault: '/static/pages/image/r.png'

@@ -4,6 +4,12 @@ Maxim-Uniapp Changelog
 
 [美信拓扑](https://www.maximtop.com/) ，一键启用多云架构的即时通讯云服务
 
+### v2.9.9 20210813
+
+1. 收取历史消息不需要额外通知；
+2. Demo bug fix: 对话中显示自己头像；
+3. 七夕快乐；
+
 ### v2.9.8 20210801
 
 1. Fix Bug: 好友信息更新时间应该使用 onRosterInfoUpdate；
