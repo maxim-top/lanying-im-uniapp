@@ -77,7 +77,7 @@ export default {
     let content = message.content || '';
     let ext = message.ext || '';
     let username = '';
-    const fromUserObj = im.rosterManage.getRosterInfo(from) || {user_id: from};
+    const fromUserObj = im.rosterManage.getRosterInfo(from);
 
     if (from == 0) {
       // system message
