@@ -5,6 +5,14 @@
       "style": {}
     },
     {
+      "path": "pages/customerIm/notification/list",
+      "style": {}
+    },
+    {
+      "path": "pages/customerIm/chatPage/index",
+      "style": {}
+    },
+    {
       "path": "pages/account/reg/index",
       "style": {}
     },

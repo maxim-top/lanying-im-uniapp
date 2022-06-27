@@ -198,6 +198,7 @@
 				}
 			},
 			pageApi(api) {
+				return
 				uni[api]({
 					url: this.to,
 					success: res => {

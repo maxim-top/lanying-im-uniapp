@@ -1,7 +1,7 @@
 <template>
   <view class="padBot">
     <view>
-      <chart-list />
+      <chartList />
     </view>
     <!--聊天工具-->
     <view class="chat-tool">
