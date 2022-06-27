@@ -53,7 +53,7 @@
       </view>
       <view class="item" @tap="goAbout">
         <view class="sleft">
-          <text class="ltext">关于我们1</text>
+          <text class="ltext">关于我们</text>
         </view>
       </view>
       <view class="item nb">
@@ -276,12 +276,8 @@ export default {
     },
 
     goAbout() {
-      // wx.navigateTo({
-      //   url: './about/index'
-      // });
-	  console.log(22222)
       wx.navigateTo({
-        url: './../customerIm/chatPage/index'
+        url: './about/index'
       });
     },
 
