@@ -9,9 +9,9 @@
 			</view>
 		</view>
 		<view class="bg-white">
-			<uni-list>
-				<uni-swipe-action>
-				<uni-swipe-action-item v-for="(item, index) in listData" :key="index">
+			<UniList>
+				<SwipeAction>
+				<SwipeActionItem v-for="(item, index) in listData" :key="index">
 					<template v-slot:right>
 						<view class="flex flex-direction align-center bg_FA5251 flex-center pad40_lr" @click="swipeClick(item, index)">
 							<image src="../static/images/notice-icon03.png" style="width:32rpx;height:36rpx"></image>
@@ -20,15 +20,25 @@
 					</template>
 				<!-- 显示圆形头像 -->
 				<!-- 右侧带角标 -->
-				<uni-list-chat :to="`/customerIm/chatPage/index?name=${item.title}&id=${item.id}`" clickable :avatar-circle="true" :title="item.title" :avatar="item.headIcon" :note="item.note" :time="item.time" :badge-text="item.badge"></uni-list-chat>
-				</uni-swipe-action-item>
-				</uni-swipe-action>
-			</uni-list>
+				<ListChat :to="`/customerIm/chatPage/index?name=${item.title}&id=${item.id}`" clickable :avatar-circle="true" :title="item.title" :avatar="item.headIcon" :note="item.note" :time="item.time" :badge-text="item.badge"></ListChat>
+				</SwipeActionItem>
+				</SwipeAction>
+			</UniList>
 		</view>
   </view>
 </template>
 <script>
+import UniList from './../compontent/uni-list/uni-list'
+import ListChat from './../compontent/uni-list-chat/uni-list-chat'
+import SwipeAction from './../compontent/uni-swipe-action/uni-swipe-action'
+import SwipeActionItem from './../compontent/uni-swipe-action-item/uni-swipe-action-item'
 export default {
+	components: {
+		UniList,
+		ListChat,
+		SwipeAction,
+		SwipeActionItem
+	},
 	data() {
     return {
 			listData: [
@@ -112,6 +122,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+@import "../static/css/global.scss";
 .bg_FA5251{
 	background-color: #FA5251
 }

@@ -20,11 +20,11 @@
               <!-- 文字 -->
               <view class="msg-text">{{ item.sendText }}</view>
             </view>
-            <view class="message" v-if="item.TextType == 1" @tap="previewImg(item.sendText)">
+            <view class="message" v-if="item.TextType == 1" @click="previewImg(item.sendText)">
               <!-- 图像 -->
               <image :src="item.sendText" class="msg-img mar10_l" mode="widthFix"></image>
             </view>
-            <view class="message" v-if="item.TextType == 2" @tap="playVoice(item.sendText.voice)">
+            <view class="message" v-if="item.TextType == 2" @click="playVoice(item.sendText.voice)">
               <!-- 音频 -->
               <view class="msg-text voice">
                 <image src="../../static/images/chat-icon08.png" class="voice-img mar10_r"></image>
@@ -37,10 +37,10 @@
             <view class="message" v-if="item.TextType == 0">
               <view class="msg-text">{{ item.sendText }}</view>
             </view>
-            <view class="message" v-if="item.TextType == 1" @tap="previewImg(item.sendText)">
+            <view class="message" v-if="item.TextType == 1" @click="previewImg(item.sendText)">
               <image :src="item.sendText" class="msg-img mar10_r" mode="widthFix"></image>
             </view>
-            <view class="message" v-if="item.TextType == 2" @tap="playVoice(item.sendText.voice)">
+            <view class="message" v-if="item.TextType == 2" @click="playVoice(item.sendText.voice)">
               <!-- 音频 -->
               <view class="msg-text voice">
                 {{ item.sendText.time }}″
@@ -54,6 +54,8 @@
   </view>
 </template>
 <script>
+//音频播放
+const innerAudioContext = uni.createInnerAudioContext();
 export default {
   props: {
     item: {
@@ -198,7 +200,8 @@ export default {
           chatmState: 0,
           TextType: 0
         }
-      ]
+      ],
+      imgMsg:[]
     };
   },
   mounted() {
@@ -210,7 +213,32 @@ export default {
     },
     scrollTop(){
       console.log('到顶了')
-    }
+    },
+    // 进行图片的预览
+    previewImg(e) {
+      // 预览图片
+      uni.previewImage({
+        current: 0,
+        urls: [e],
+        longPressActions: {
+          itemList: ['发送给朋友', '保存图片', '收藏'],
+          success: function(data) {
+            console.log('选中了第' + (data.tapIndex + 1) + '个按钮,第' + (data.index + 1) + '张图片');
+          },
+          fail: function(err) {
+            console.log(err.errMsg);
+          }
+        }
+      });
+    },
+    //音频播放
+    playVoice(e) {
+      console.log(1111111, e)
+      innerAudioContext.src = e;
+      innerAudioContext.onPlay(() => {
+        console.log('开始播放');
+      });
+    },
   }
 };
 </script>

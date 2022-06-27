@@ -56,6 +56,7 @@ import chartList from './../compontent/chart-list/chart-list'
 </script>
 
 <style lang="scss" scoped>
+@import "../static/css/global.scss";
 page {
   background-color: #f2f2f2;
 }
