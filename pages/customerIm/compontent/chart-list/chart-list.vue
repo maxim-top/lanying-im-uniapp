@@ -1,49 +1,40 @@
 <template>
   <view class="border_b pad30_tb pad_bottom">
     <!-- 聊天内容 -->
-    <scroll-view
-      class="chat"
-      scroll-y="true"
-      scroll-with-animation="true"
-      :scroll-into-view="scrollToView"
-      @scrolltoupper="scrollTop"
-    >
+    <scroll-view class="chat" scroll-y="true" scroll-with-animation="true" :scroll-into-view="scrollToView" @scrolltoupper="scrollTop">
       <view class="chat-main" :style="{ paddingBottom: inputh + 'px' }">
         <view class="chat-ls" v-for="(item, index) in msg" :key="index" :id="'msg' + index">
-          <view class="chat-time" v-if="item.createTime != ''">2022-06-23 16:04:07</view>
-          <view class="msg-m msg-left" v-if="item.sendName == friendName">
-            <image
-              class="user-img"
-              src="https://file-tandian.nxin.com/x_image_81849323-10f2-4459-b5be-426fa69d064a.jpg?imageView2/1/w/128"
-            ></image>
-            <view class="message" v-if="item.TextType == 0">
+          <view class="chat-time" v-if="item.timestamp != ''">2022-06-23 16:04:07</view>
+          <view class="msg-m msg-left" v-if="item.from == friendName">
+            <image class="user-img" src="https://file-tandian.nxin.com/x_image_81849323-10f2-4459-b5be-426fa69d064a.jpg?imageView2/1/w/128"></image>
+            <view class="message" v-if="item.type == 'text'">
               <!-- 文字 -->
-              <view class="msg-text">{{ item.sendText }}</view>
+              <view class="msg-text">{{ item.content }}</view>
             </view>
-            <view class="message" v-if="item.TextType == 1" @click="previewImg(item.sendText)">
+            <view class="message" v-if="item.type == 'image'" @click="previewImg(item.content)">
               <!-- 图像 -->
-              <image :src="item.sendText" class="msg-img mar10_l" mode="widthFix"></image>
+              <image :src="item.content" class="msg-img mar10_l" mode="widthFix"></image>
             </view>
-            <view class="message" v-if="item.TextType == 2" @click="playVoice(item.sendText.voice)">
+            <view class="message" v-if="item.type == 'audio'" @click="playVoice(item.content.voice)">
               <!-- 音频 -->
               <view class="msg-text voice">
                 <image src="../../static/images/chat-icon08.png" class="voice-img mar10_r"></image>
-                {{ item.sendText.time }}″
+                {{ item.content.time }}″
               </view>
             </view>
           </view>
-          <view class="msg-m msg-right" v-if="item.sendName != friendName">
+          <view class="msg-m msg-right" v-if="item.from != friendName">
             <image class="user-img" src="https://file-tandian.nxin.com/icons/head.png"></image>
-            <view class="message" v-if="item.TextType == 0">
-              <view class="msg-text">{{ item.sendText }}</view>
+            <view class="message" v-if="item.type == 'text'">
+              <view class="msg-text">{{ item.content }}</view>
             </view>
-            <view class="message" v-if="item.TextType == 1" @click="previewImg(item.sendText)">
-              <image :src="item.sendText" class="msg-img mar10_r" mode="widthFix"></image>
+            <view class="message" v-if="item.type == 'image'" @click="previewImg(item.content)">
+              <image :src="item.content" class="msg-img mar10_r" mode="widthFix"></image>
             </view>
-            <view class="message" v-if="item.TextType == 2" @click="playVoice(item.sendText.voice)">
+            <view class="message" v-if="item.type == 'audio'" @click="playVoice(item.content.voice)">
               <!-- 音频 -->
               <view class="msg-text voice">
-                {{ item.sendText.time }}″
+                {{ item.content.time }}″
                 <image src="../../static/images/chat-icon08.png" class="voice-img"></image>
               </view>
             </view>
@@ -70,138 +61,120 @@ export default {
       friendName: 'xpq',
       msg: [
         {
-          sendName: 'xpq',
-          receviceName: '゛时光い',
-          sendText: {
-            address: '湖南省岳阳市湘阴县新世纪大道',
-            latitude: 28.68925,
-            longitude: 112.90917,
-            name: '湘阴县政府(新世纪大道北)'
-          },
-          createTime: '2022-01-06 12:40:12',
-          updateTime: null,
-          chatmState: 1,
-          TextType: 3
-        },
-        {
-          sendName: '゛时光い',
-          receviceName: 'xpq',
-          sendText: {
-            voice: '时光匆匆流过',
-            time: 2 //秒
-          },
-          createTime: '2022-01-06 12:22:12',
-          updateTime: null,
-          chatmState: 1,
-          TextType: 2
-        },
-        {
-          sendName: 'xpq',
-          receviceName: '゛时光い',
-          sendText: {
+          from: 'xpq',
+          to: '゛时光い',
+          content: {
             voice: '谢谢你',
             time: 60 //秒
           },
-          createTime: '2022-01-06 12:00:12',
+          timestamp: '2022-01-06 12:00:12',
           updateTime: null,
           chatmState: 1,
-          TextType: 2
+          type: 'audio',
+          toType: 'roster'
         },
         {
-          sendName: '゛时光い',
-          receviceName: 'xpq',
-          sendText: '这是第九条未读消息',
-          createTime: '2022-01-03 12:22:12',
+          from: '゛时光い',
+          to: 'xpq',
+          content: '这是第九条未读消息',
+          timestamp: '2022-01-03 12:22:12',
           updateTime: null,
           chatmState: 1,
-          TextType: 0
+          type: 'text',
+          toType: 'roster'
         },
         {
-          sendName: '゛时光い',
-          receviceName: 'xpq',
-          sendText: '这是第八条未读消息',
-          createTime: '2022-01-02 12:22:07',
+          from: '゛时光い',
+          to: 'xpq',
+          content: '这是第八条未读消息',
+          timestamp: '2022-01-02 12:22:07',
           updateTime: null,
           chatmState: 1,
-          TextType: 0
+          type: 'text',
+          toType: 'roster'
         },
         {
-          sendName: 'xpq',
-          receviceName: 'xpq',
-          sendText: '这是第七条未读消息',
-          createTime: '2021-12-19 12:22:03',
+          from: 'xpq',
+          to: 'xpq',
+          content: '这是第七条未读消息',
+          timestamp: '2021-12-19 12:22:03',
           updateTime: null,
           chatmState: 1,
-          TextType: 0
+          type: 'text',
+          toType: 'roster'
         },
         {
-          sendName: '゛时光い',
-          receviceName: 'xpq',
-          sendText: '这是第六条未读消息',
-          createTime: '2021-12-19 12:21:58',
+          from: '゛时光い',
+          to: 'xpq',
+          content: '这是第六条未读消息',
+          timestamp: '2021-12-19 12:21:58',
           updateTime: null,
           chatmState: 1,
-          TextType: 0
+          type: 'text',
+          toType: 'roster'
         },
         {
-          sendName: '゛时光い',
-          receviceName: 'xpq',
-          sendText:
-            'http://demo.rageframe.com/attachment/images/2021/11/18/image_1637224530_diIlZlmm.jpeg',
-          createTime: '2021-12-19 12:21:54',
+          from: '゛时光い',
+          to: 'xpq',
+          content: 'http://demo.rageframe.com/attachment/images/2021/11/18/image_1637224530_diIlZlmm.jpeg',
+          timestamp: '2021-12-19 12:21:54',
           updateTime: null,
           chatmState: 1,
-          TextType: 1
+          type: 'image',
+          toType: 'roster'
         },
         {
-          sendName: 'xpq',
-          receviceName: '゛时光い',
-          sendText:
-            'http://demo2.rageframe.com/attachment/images/2021/09/01/image_1630483477_N03W37zs.jpg',
-          createTime: '2021-12-19 12:21:48',
+          from: 'xpq',
+          to: '゛时光い',
+          content: 'http://demo2.rageframe.com/attachment/images/2021/09/01/image_1630483477_N03W37zs.jpg',
+          timestamp: '2021-12-19 12:21:48',
           updateTime: null,
           chatmState: 1,
-          TextType: 1
+          type: 'image',
+          toType: 'roster'
         },
         {
-          sendName: '゛时光い',
-          receviceName: 'xpq',
-          sendText: '这是第三条未读消息',
-          createTime: '2021-12-19 12:21:42',
+          from: '゛时光い',
+          to: 'xpq',
+          content: '这是第三条未读消息',
+          timestamp: '2021-12-19 12:21:42',
           updateTime: null,
           chatmState: 1,
-          TextType: 0
+          type: 'text',
+          toType: 'roster'
         },
         {
-          sendName: '゛时光い',
-          receviceName: 'xpq',
-          sendText: '这是第二条未读消息',
-          createTime: '2021-12-19 12:21:33',
+          from: '゛时光い',
+          to: 'xpq',
+          content: '这是第二条未读消息',
+          timestamp: '2021-12-19 12:21:33',
           updateTime: null,
           chatmState: 1,
-          TextType: 0
+          type: 'text',
+          toType: 'roster'
         },
         {
-          sendName: '゛时光い',
-          receviceName: 'xpq',
-          sendText:
-            'http://demo2.rageframe.com/attachment/images/2021/09/01/image_1630483477_N03W37zs.jpg',
-          createTime: '2021-12-19 11:02:18',
+          from: '゛时光い',
+          to: 'xpq',
+          content: 'http://demo2.rageframe.com/attachment/images/2021/09/01/image_1630483477_N03W37zs.jpg',
+          timestamp: '2021-12-19 11:02:18',
           updateTime: null,
           chatmState: 1,
-          TextType: 1
+          type: 'image',
+          toType: 'roster'
         },
         {
-          sendName: '゛时光い',
-          receviceName: 'xpq',
-          sendText: '爱你啊',
-          createTime: '2021-12-18 20:37:03',
+          from: '゛时光い',
+          to: 'xpq',
+          content: '爱你啊',
+          timestamp: '2021-12-18 20:37:03',
           updateTime: null,
           chatmState: 0,
-          TextType: 0
+          type: 'text',
+          toType: 'roster'
         }
       ],
-      imgMsg:[]
+      imgMsg: []
     };
   },
   mounted() {
@@ -211,8 +184,8 @@ export default {
     clickItem(item) {
       this.$emit('clickItem', item);
     },
-    scrollTop(){
-      console.log('到顶了')
+    scrollTop() {
+      console.log('到顶了');
     },
     // 进行图片的预览
     previewImg(e) {
@@ -222,10 +195,10 @@ export default {
         urls: [e],
         longPressActions: {
           itemList: ['发送给朋友', '保存图片', '收藏'],
-          success: function(data) {
+          success: function (data) {
             console.log('选中了第' + (data.tapIndex + 1) + '个按钮,第' + (data.index + 1) + '张图片');
           },
-          fail: function(err) {
+          fail: function (err) {
             console.log(err.errMsg);
           }
         }
@@ -233,12 +206,12 @@ export default {
     },
     //音频播放
     playVoice(e) {
-      console.log(1111111, e)
+      console.log(1111111, e);
       innerAudioContext.src = e;
       innerAudioContext.onPlay(() => {
         console.log('开始播放');
       });
-    },
+    }
   }
 };
 </script>
