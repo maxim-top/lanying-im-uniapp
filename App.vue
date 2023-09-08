@@ -1,5 +1,5 @@
 <script>
-import flooim from './im/floo-2.0.0.uniapp';
+import flooim from './sdk/index';
 
 const AUTO_LOGIN_DELAY = 2000; // ms
 const AUTO_LOGIN_TIMES_MAX = 3;
@@ -8,14 +8,23 @@ const INIT_CHECK_TIMES_MAX = 20;
 
 export default {
   onLaunch: function () {
-    wx.showShareMenu();
+    const host = uni.getSystemInfoSync().host;
+    if (host && host.env && host.env === 'WeChat') {
+      this.globalData.isWeChat = true;
+      uni.showShareMenu();
+    }
   },
 
   onLoad() {
-    this.setNavPosition();
+    if (!this.globalData.initWindowParams) {
+      this.setNavPosition();
+    }
   },
 
   onShow() {
+    if (!this.globalData.initWindowParams) {
+      this.setNavPosition();
+    }
     this.ensureIMLogin();
   },
 
@@ -32,11 +41,14 @@ export default {
 
   globalData: {
     im: {},
-    navTop: 24,
-    navHeight: 60,
+    initWindowParams: false,
+    navTop: 45,
+    navHeight: 85,
+    menuButtonWidth: 0,
     // dnsServer: "https://dns.lanyingim.com/v2/app_dns",
     ws: true,
-    autoLogin: true
+    autoLogin: true,
+    isWeChat: false
   },
 
   methods: {
@@ -107,9 +119,14 @@ export default {
       return this.globalData.im;
     },
 
+    isWeChatEnvironment() {
+      return this.globalData.isWeChat;
+    },
+
     setupIM(appid) {
       console.log('Change appid to ', appid);
       this.saveAppid(appid);
+      this.saveAppidList(appid);
 
       const im = this.getIM();
       im && im.logout && im.logout();
@@ -130,6 +147,23 @@ export default {
       return wx.getStorageSync('lanying_im_appid') || 'welovemaxim';
     },
 
+    saveAppidList(appid) {
+      let appidList = this.getAppidList();
+      const index = appidList.findIndex((a) => a == appid);
+      if (index < 0) {
+        appidList.push(appid);
+      }
+      wx.setStorageSync('lanying_im_appid_list', appidList);
+    },
+
+    getAppidList() {
+      return wx.getStorageSync('lanying_im_appid_list') || ['welovemaxim'];
+    },
+
+    clearAppidList() {
+      return wx.setStorageSync('lanying_im_appid_list', ['welovemaxim']);
+    },
+
     saveLoginInfo(info) {
       wx.setStorageSync('lanying_im_logininfo', info);
     },
@@ -144,10 +178,11 @@ export default {
 
     imLogout() {
       const info = this.getLoginInfo();
+      const isWeChat = this.isWeChatEnvironment();
       this.getIM().logout();
       this.removeLoginInfo();
-      wx.reLaunch({
-        url: '../account/login/index'
+      uni.reLaunch({
+        url: isWeChat ? '/pages/profile/index' : '/pages/account/login/index'
       });
     },
 
@@ -267,16 +302,9 @@ export default {
       const info = this.getLoginInfo();
       const username = info ? info.username : '';
 
-      if ('wechat_test' === username) {
-        // tester ... go work list ...
-        wx.redirectTo({
-          url: '/pages/work/list/index'
-        });
-      } else {
-        wx.switchTab({
-          url: '/pages/contact/index'
-        });
-      }
+      wx.switchTab({
+        url: '/pages/contact/index'
+      });
     },
 
     onLoginFail(msg) {
@@ -295,22 +323,35 @@ export default {
       // this.setNavPosition();
       return this.globalData.navHeight;
     },
+
+    getMenuButtonWidth() {
+      return this.globalData.menuButtonWidth;
+    },
+
     setNavPosition() {
-      let menuButtonObject = wx.getMenuButtonBoundingClientRect();
-      if (!menuButtonObject) return;
-
-      wx.getSystemInfo({
-        success: (res) => {
-          let statusBarHeight = res.statusBarHeight;
-          this.globalData.navTop = menuButtonObject.top; //胶囊按钮与顶部的距离
-          this.globalData.navHeight = statusBarHeight + menuButtonObject.height + (menuButtonObject.top - statusBarHeight) * 2; //导航高度
-
-          console.log('NavHeight: ' + this.globalData.navHeight + ' navTop: ' + this.globalData.navTop);
-        },
-        fail: (err) => {
-          console.log(err);
+      this.globalData.initWindowParams = true;
+      if (this.globalData.isWeChat) {
+        let menuButtonObject = uni.getMenuButtonBoundingClientRect();
+        if (!menuButtonObject) {
+          this.globalData.navTop = 24;
+          this.globalData.navHeight = 60;
+          return;
         }
-      });
+        uni.getSystemInfo({
+          success: (res) => {
+            let statusBarHeight = res.statusBarHeight;
+            this.globalData.navTop = menuButtonObject.top - 3; //胶囊按钮与顶部的距离
+            this.globalData.navHeight = menuButtonObject.bottom + (menuButtonObject.top - statusBarHeight) / 2; //导航高度
+            this.globalData.menuButtonWidth = menuButtonObject.width;
+          },
+          fail: (err) => {
+            console.log(err);
+          }
+        });
+      } else {
+        this.globalData.navTop = 24;
+        this.globalData.navHeight = 60;
+      }
     }
   }
 };

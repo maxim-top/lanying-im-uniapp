@@ -5,7 +5,8 @@
 .back .back_kmg {
   width: 40rpx;
   height: 40rpx;
-  margin-top: 12rpx;
+  margin-top: 18rpx;
+  margin-left: 20rpx;
 }
 
 .container {
@@ -85,6 +86,10 @@
   line-height: 80rpx;
   font-size: 28rpx;
   color: #333;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 66.6%;
 }
 
 .check {

@@ -9,22 +9,42 @@
         <view class="rosterInfo">
           <image class="avatar" :src="avatar" @tap="goUserProfile"></image>
         </view>
-        <view class="name_frame" v-if="cls == 'roster'">
-          <text>{{ username }}</text>
-        </view>
-        <view class="c_content">
-          <text v-if="type == 'text'">
-            {{ content }}
-            <br />
-            <text v-if="ext">ext: {{ ext }}</text>
-          </text>
-          <image class="cimage" v-if="type == 'image'" :src="attachImage"></image>
-          <video class="cimage" v-if="type == 'video'" :src="video"></video>
-          <!-- <audio name="音频文件" wx:if="{{type == 'image'}}" author="" src="{{audio}}" class="saudio" controls></audio> -->
-          <view class="voice_frmae" v-if="type == 'audio'" @tap="splayAudio">
-            <image class="voice" v-if="playing == false" src="/static/pages/image/voice/stop.png"></image>
-            <image class="voice" v-if="playing == true" src="/static/pages/image/voice/start.png"></image>
-            <text class="voice_duration">'{{ attach.duration }}</text>
+        <view class="rosterContent">
+          <view class="name_frame" v-if="cls == 'roster'">
+            <text>{{ username }}</text>
+          </view>
+          <view class="c_content">
+            <text v-if="type == 'text'">
+              {{ content }}
+              <br />
+              <text v-if="ext">ext: {{ ext }}</text>
+            </text>
+            <view class="file_frame" v-if="type == 'file'" @tap="touchFile">
+              <image class="file" src="/static/pages/image/file.png"></image>
+              <text class="file_name">{{ fileName }}</text>
+            </view>
+            <image class="cimage" v-if="type == 'image'" :src="attachImage" @tap="touchImage"></image>
+            <video
+              class="cimage"
+              v-if="type == 'video'"
+              :src="video"
+              :id="id"
+              :controls="showBar"
+              @tap="touchVideo"
+              @play="playVideo"
+              @ended="endPlay"
+              @fullscreenchange="fullScreenChange"
+            ></video>
+            <!-- <audio name="音频文件" wx:if="{{type == 'image'}}" author="" src="{{audio}}" class="saudio" controls></audio> -->
+            <view class="voice_frmae" v-if="type == 'audio'" @tap="splayAudio">
+              <image class="voice" v-if="playing == false" src="/static/pages/image/voice/stop.png"></image>
+              <image class="voice" v-if="playing == true" src="/static/pages/image/voice/start.png"></image>
+              <text class="voice_duration">'{{ attach.duration }}</text>
+            </view>
+            <view class="location_frame" v-if="type == 'location'">
+              <image class="location" src="/static/pages/image/loc.png"></image>
+              <text class="location_content">{{ addr }}</text>
+            </view>
           </view>
         </view>
       </view>
@@ -47,10 +67,19 @@ export default {
       contentType: 0,
       content: '',
       ext: '',
+      addr: '',
+      fileName: '',
+      file: '',
       attachImage: '',
       videoCover: '',
       video: '',
       audio: '',
+      videoContext: null,
+      playingVideo: false,
+      fullScreen: false,
+      fullScreenPadding: false,
+      showBar: false,
+      id: '',
       messageType: 0,
       time: '',
       playing: false,
@@ -75,16 +104,20 @@ export default {
     const uid = im.userManage.getUid();
     const from = message.from;
     const cls = uid == from ? 'self' : 'roster';
+    const id = message.id;
+    let videoContext = null;
     const type = message.type;
     const toType = message.toType;
     let content = message.content || '';
     let ext = message.ext || '';
+    let addr = '';
+    let fileName = '';
     let username = '';
     const fromUserObj = im.rosterManage.getRosterInfo(from);
 
     let avatar = im.sysManage.getImage({
       avatar: fromUserObj.avatar,
-      sdefault: '/static/pages/image/r.png'
+      sdefault: '/static/pages/image/r_b.png'
     });
     username = fromUserObj.nick_name || fromUserObj.username || '';
 
@@ -94,6 +127,15 @@ export default {
 
     const attach = message.attach || {};
     let url = attach.url || '';
+
+    if (type === 'location') {
+      addr = attach.addr;
+    }
+
+    if (url && type === 'file') {
+      fileName = attach.dName || 'file';
+      url = im.sysManage.getChatFile({ url });
+    }
 
     if (url && type === 'image') {
       url = im.sysManage.getImage({
@@ -109,6 +151,7 @@ export default {
         thumbnail: true
       });
       url = im.sysManage.getChatFile({ url });
+      videoContext = uni.createVideoContext(id, this);
     }
 
     if (url && type === 'audio') {
@@ -147,22 +190,27 @@ export default {
       toType,
       content,
       ext,
+      addr,
+      file: url,
+      fileName,
       attachImage: url,
       videoCover,
       video: url,
+      videoContext,
+      id,
       time,
       from
     });
   },
-  onShow: function () {
+  mounted: function () {
     const im = getApp().getIM();
     const message = this.message;
 
     // Message displayed as read
     const fromUid = toNumber(message.from);
     const uid = im.userManage.getUid();
-    if (fromUid !== uid && message.status !== 'read') {
-      im.groupManage.readGroupMessage(this.uid, this.message.id);
+    if (fromUid !== uid && message.status !== 2) {
+      im.groupManage.readGroupMessage(fromUid, this.message.id);
     }
   },
   methods: {
@@ -191,6 +239,105 @@ export default {
         });
       });
       innerAudioContext.play();
+    },
+
+    touchFile() {
+      let url = this.file;
+      const im = getApp().getIM();
+      im.sysManage
+        .downloadChatFile({ url })
+        .then((res) => {
+          uni.openDocument({
+            filePath: res,
+            showMenu: true,
+            success: function () {
+              console.log('文件打开成功！');
+            },
+            fail: function (res) {
+              let title = '文件打开失败！';
+              if (res.errno == 1300301) {
+                title = '文件格式不支持，打开失败！';
+              }
+              uni.showToast({
+                title
+              });
+            }
+          });
+        })
+        .catch((err) => {
+          console.log('文件下载失败：' + err);
+        });
+    },
+
+    touchImage() {
+      const message = this.message;
+      const im = getApp().getIM();
+      const attach = message.attach || {};
+      let url = attach.url || '';
+      url = im.sysManage.getImage({
+        avatar: url,
+        thumbnail: false
+      });
+      uni.previewImage({
+        current: url,
+        urls: [url]
+      });
+    },
+
+    touchVideo() {
+      if (this.fullScreenPadding === false) {
+        if (this.fullScreen === false) {
+          this.videoContext.requestFullScreen();
+          this.videoContext.play();
+        } else {
+          if (this.playingVideo) {
+          } else {
+            this.videoContext.play();
+          }
+        }
+      }
+    },
+
+    playVideo() {
+      this.setData({
+        playingVideo: true
+      });
+    },
+
+    endPlay() {
+      this.setData({
+        playingVideo: false
+      });
+    },
+
+    fullScreenChange(event) {
+      this.setData({
+        fullScreenPadding: true
+      });
+      if (event.detail.fullScreen) {
+        this.setData({
+          fullScreen: true,
+          showBar: true
+        });
+      } else {
+        this.videoContext.stop();
+        this.setData({
+          fullScreen: false,
+          showBar: false,
+          playingVideo: false,
+          type: 'video_padding'
+        });
+        setTimeout(() => {
+          this.setData({
+            type: 'video'
+          });
+        }, 50);
+      }
+      setTimeout(() => {
+        this.setData({
+          fullScreenPadding: false
+        });
+      }, 100);
     },
 
     goUserProfile() {
