@@ -76,7 +76,7 @@ export default {
         .then((res) => {
           res.avatar = im.sysManage.getImage({
             avatar: res.avatar,
-            sdefault: '/static/pages/image/r.png'
+            sdefault: '/static/pages/image/r_b.png'
           });
           this.setData({
             rosterInfo: res

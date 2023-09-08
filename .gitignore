@@ -2,3 +2,6 @@ node_modules
 .DS_Store
 lanying-im-uniapp
 unpackage
+.hbuilderx/*.*
+floo-2.0.0.uniapp.js
+floo-3.0.0.uniapp.js

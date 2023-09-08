@@ -4,6 +4,15 @@
       <text class="atitle">蓝莺IM</text>
     </snav>
     <view class="container" :style="'padding-top:' + navHeight + 'px'">
+      <view class="background" v-if="!isLogin || (isLogin && conversationList.length === 0)">
+        <image class="background_kmg" src="/static/pages/image/background.png"></image>
+        <view v-if="!isLogin">
+          <text>你还没有登录，请先在设置页面进行登录操作</text>
+        </view>
+        <view v-if="isLogin && conversationList.length === 0">
+          <text>你没有聊天会话，可以在联系人页面下操作添加好友或创建群组</text>
+        </view>
+      </view>
       <view v-for="(conversation, index) in conversationList" :key="index" @tap="touchConversation" :data-type="conversation.type" :data-sid="conversation.sid" class="item">
         <view v-if="conversation.unread != 0" class="unread_number">
           <text>{{ conversation.unread }}</text>
@@ -35,6 +44,8 @@ export default {
     return {
       conversationList: [],
       navHeight: 0,
+      isLogin: false,
+      isRelaunch: false,
       system_avatar: {
         name: '系统通知',
         avatar: '/static/pages/image/tab/setting.png'
@@ -45,17 +56,34 @@ export default {
   components: {},
   props: {},
   onShow: function () {
-    const token = getApp().getIM().userManage.getToken();
-
-    if (!token) {
-      if (getApp().isLoginPage === false) {
-        getApp().isLoginPage = true;
-        wx.reLaunch({
-          url: '../login/index'
-        });
-      }
+    if (this.isRelaunch) {
+      this.setData({
+        isRelaunch: false
+      });
+      uni.reLaunch({
+        url: '../conversation/index'
+      });
     } else {
-      this.getConversationList();
+      const isLogin = getApp().isIMLogin();
+
+      this.setData({
+        isLogin
+      });
+
+      if (!isLogin) {
+        this.setData({
+          conversationList: []
+        });
+        if (getApp().isLoginPage === false) {
+          getApp().isLoginPage = true;
+          const isWeChat = getApp().isWeChatEnvironment();
+          uni.reLaunch({
+            url: isWeChat ? '../profile/index' : '../login/index'
+          });
+        }
+      } else {
+        this.getConversationList();
+      }
     }
   },
   onLoad: function () {
@@ -80,6 +108,11 @@ export default {
       });
       im.on('onRosterListUpdate', (message) => {
         this.getConversationList();
+      });
+      im.on('onReceiveHistoryMsg', () => {
+        this.setData({
+          isRelaunch: true
+        });
       });
 
       im.on('onDisconnect', () => {
@@ -131,7 +164,7 @@ export default {
           name = sroster.nick_name || sroster.username || sroster.user_id;
           avatar = im.sysManage.getImage({
             avatar: sroster.avatar,
-            sdefault: '/static/pages/image/r.png'
+            sdefault: '/static/pages/image/r_b.png'
           });
         } else if (item.type === 'group') {
           //group

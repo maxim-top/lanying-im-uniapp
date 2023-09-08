@@ -25,7 +25,7 @@
 }
 
 .msgcontainer .c_content {
-  max-width: 400rpx;
+  max-width: 66.6%;
   border-radius: 10rpx;
   padding: 25rpx 20rpx;
   line-height: 40rpx;
@@ -35,27 +35,51 @@
 .self .rosterInfo {
   float: right;
 }
-.self .c_content {
+
+.self .rosterContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.self .rosterContent .c_content {
   float: right;
   background: rgb(155, 200, 255);
   margin-right: 35rpx;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
 }
 
 .roster .rosterInfo {
   float: left;
 }
-.roster .name_frame {
+
+.roster .rosterContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.roster .rosterContent .name_frame {
   float: left;
   margin-left: 45rpx;
   color: rgb(145, 145, 145);
   font-size: 20rpx;
   margin-bottom: 5rpx;
-  width: 80%;
+  max-width: 33.3%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
-.roster .c_content {
+
+.roster .rosterContent .c_content {
   float: left;
   border: 1px solid rgb(240, 240, 240);
   margin-left: 35rpx;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
 }
 
 .c_content .cimage {
@@ -73,6 +97,26 @@
   overflow: hidden;
 }
 
+.file_frame {
+  overflow: hidden;
+  display: flex;
+}
+
+.file_frame .file {
+  width: 60rpx;
+  height: 60rpx;
+  min-width: 60rpx;
+  min-height: 60rpx;
+  float: left;
+}
+
+.file_frame .file_name {
+  margin-left: 20rpx;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+}
+
 .voice_frmae {
   overflow: hidden;
 }
@@ -84,4 +128,24 @@
 }
 .voice_frmae .voice_duration {
   margin-left: 20rpx;
+}
+
+.location_frame {
+  overflow: hidden;
+  display: flex;
+}
+
+.location_frame .location {
+  width: 60rpx;
+  height: 60rpx;
+  min-width: 60rpx;
+  min-height: 60rpx;
+  float: left;
+}
+
+.location_frame .location_content {
+  margin-left: 20rpx;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
 }

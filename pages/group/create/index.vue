@@ -82,7 +82,7 @@ export default {
               let avatar = rosterInfo.avatar;
               avatar = im.sysManage.getImage({
                 avatar: rosterInfo.avatar,
-                sdefault: '/static/pages/image/r.png'
+                sdefault: '/static/pages/image/r_b.png'
               });
               return Object.assign({}, rosterInfo, {
                 unreadCount,

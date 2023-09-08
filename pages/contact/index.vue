@@ -8,39 +8,68 @@
         <view data-num="1" :class="'tag ' + (menuCurr == 1 ? 'sel' : '')" @tap.stop="menuClick">
           <text>群组</text>
         </view>
-        <view v-if="showsupports" data-num="2" :class="'tag ' + (menuCurr == 2 ? 'sel' : '')" @tap.stop="menuClick">
+        <view data-num="2" :class="'tag ' + (menuCurr == 2 ? 'sel' : '')" @tap.stop="menuClick">
           <text>客服</text>
         </view>
       </view>
     </snav>
     <view class="container" :style="'padding-top:' + navHeight + 'px'">
-      <view v-if="menuCurr == 0" class="item" @tap="addRoster">
-        <image src="/static/pages/image/add.png" class="avatar"></image>
-        <text class="uname">添加好友</text>
+      <view v-if="menuCurr == 0">
+        <view class="item" @tap="addRoster">
+          <image src="/static/pages/image/add.png" class="avatar"></image>
+          <text class="uname">添加好友</text>
+        </view>
+        <view class="background" v-if="!isLogin || (isLogin && rosterList.length === 0)">
+          <image class="background_kmg" src="/static/pages/image/background.png"></image>
+          <view v-if="!isLogin">
+            <text>你还没有登录，请先在设置页面进行登录操作</text>
+          </view>
+          <view v-if="isLogin && rosterList.length === 0">
+            <text>你还没有添加好友，可以点击添加好友头像进行操作</text>
+          </view>
+        </view>
+        <view v-for="(item, index) in rosterList" :key="index" :data-uid="item.user_id" :data-nick="item.nick_name || item.username || item.user_id" class="item" @tap="goChat">
+          <image :src="item.avatar" class="avatar"></image>
+          <text class="uname">{{ item.nick_name || item.username || item.user_id }}</text>
+        </view>
       </view>
-      <view v-if="menuCurr == 1" class="item" @tap="createGroup">
-        <image src="/static/pages/image/cgroup.png" class="avatar"></image>
-        <text class="uname">创建群组</text>
+      <view v-if="menuCurr == 1">
+        <view class="item" @tap="createGroup">
+          <image src="/static/pages/image/cgroup.png" class="avatar"></image>
+          <text class="uname">创建群组</text>
+        </view>
+        <view class="item" @tap="joinGroup">
+          <image src="/static/pages/image/cgroup.png" class="avatar" :style="'filter: brightness(1) invert(0.3)'"></image>
+          <text class="uname">加入群组</text>
+        </view>
+        <view class="background" v-if="!isLogin || (isLogin && groupList.length === 0)">
+          <image class="background_kmg" src="/static/pages/image/background.png"></image>
+          <view v-if="!isLogin">
+            <text>你还没有登录，请先在设置页面进行登录操作</text>
+          </view>
+          <view v-if="isLogin && rosterList.length === 0">
+            <text>你还没有加入群组，可以点击创建群组头像进行操作</text>
+          </view>
+        </view>
+        <view v-for="(item, index) in groupList" :key="index" :data-gid="item.group_id" class="item" @tap="goGroup">
+          <image :src="item.avatar" class="avatar"></image>
+          <text class="uname">{{ item.name }}</text>
+        </view>
       </view>
-      <view
-        v-for="(item, index) in rosterList"
-        :key="index"
-        v-if="menuCurr == 0"
-        :data-uid="item.user_id"
-        :data-nick="item.nick_name || item.username || item.user_id"
-        class="item"
-        @tap="goChat"
-      >
-        <image :src="item.avatar" class="avatar"></image>
-        <text class="uname">{{ item.nick_name || item.username || item.user_id }}</text>
-      </view>
-      <view v-for="(item, index) in groupList" :key="index" v-if="menuCurr == 1" :data-gid="item.group_id" class="item" @tap="goGroup">
-        <image :src="item.avatar" class="avatar"></image>
-        <text class="uname">{{ item.name }}</text>
-      </view>
-      <view v-for="(item, index) in staticList" :key="index" v-if="menuCurr == 2" :data-uid="item.user_id" :data-nick="item.nickname" class="item" @tap="goChat">
-        <image :src="item.avatar" class="avatar"></image>
-        <text class="uname">{{ item.nick_name || item.nickname || item.username }}</text>
+      <view v-if="menuCurr == 2">
+        <view class="background" v-if="!isLogin || (isLogin && !showsupports)">
+          <image class="background_kmg" src="/static/pages/image/background.png"></image>
+          <view v-if="!isLogin">
+            <text>如果想联系技术支持，请将App ID切换成"welovemaxim"后进行登录操作</text>
+          </view>
+          <view v-if="isLogin && !showsupports">
+            <text>如果想联系技术支持,请退出后,将App ID切换成"welovemaxim"</text>
+          </view>
+        </view>
+        <view v-for="(item, index) in staticList" v-if="showsupports" :key="index" :data-uid="item.user_id" :data-nick="item.nickname" class="item" @tap="goChat">
+          <image :src="item.avatar" class="avatar"></image>
+          <text class="uname">{{ item.nick_name || item.nickname || item.username }}</text>
+        </view>
       </view>
     </view>
   </view>
@@ -57,7 +86,8 @@ export default {
       showGroup: true,
       menuCurr: 0,
       navHeight: 0,
-      showsupports: false
+      showsupports: false,
+      isLogin: false
     };
   },
 
@@ -81,8 +111,15 @@ export default {
       });
     }
 
-    this.getRosterList();
-    this.getGroupList();
+    const isLogin = getApp().isIMLogin();
+    this.setData({
+      isLogin
+    });
+
+    if (isLogin) {
+      this.getRosterList();
+      this.getGroupList();
+    }
     const showsupports = getApp().getAppid() == 'welovemaxim';
     if (showsupports) {
       this.asyncGetStatics();
@@ -93,11 +130,35 @@ export default {
     });
   },
   onShow: function () {
-    if (!getApp().isIMLogin()) {
-      getApp().isLoginPage = true;
-      wx.reLaunch({
-        url: '../login/index'
+    const isLogin = getApp().isIMLogin();
+    const showsupports = getApp().getAppid() == 'welovemaxim';
+    this.setData({
+      isLogin,
+      showsupports
+    });
+    if (!isLogin) {
+      this.setData({
+        rosterList: [],
+        groupList: [],
+        staticList: []
       });
+      getApp().isLoginPage = true;
+      const isWeChat = getApp().isWeChatEnvironment();
+      if (!isWeChat) {
+        uni.reLaunch({
+          url: '../login/index'
+        });
+      }
+    } else {
+      if (this.rosterList.length == 0) {
+        this.getRosterList();
+      }
+      if (this.groupList.length == 0) {
+        this.getGroupList();
+      }
+      if (this.showsupports && this.staticList.length == 0) {
+        this.asyncGetStatics();
+      }
     }
   },
   methods: {
@@ -131,7 +192,7 @@ export default {
               let avatar = rosterInfo.avatar;
               avatar = im.sysManage.getImage({
                 avatar: rosterInfo.avatar,
-                sdefault: '/static/pages/image/r.png'
+                sdefault: '/static/pages/image/r_b.png'
               });
               return Object.assign({}, rosterInfo, {
                 unreadCount,
@@ -191,7 +252,7 @@ export default {
         res = res.map((x) => {
           x.avatar = im.sysManage.getImage({
             avatar: x.avatar,
-            sdefault: '/static/pages/image/r.png'
+            sdefault: '/static/pages/image/r_b.png'
           });
           return x;
         });
@@ -201,14 +262,37 @@ export default {
       });
     },
     addRoster: function () {
-      wx.navigateTo({
-        url: '../roster/add/index'
-      });
+      if (this.isLogin) {
+        uni.navigateTo({
+          url: '../roster/add/index'
+        });
+      } else {
+        uni.navigateTo({
+          url: '../account/loginreminder/index'
+        });
+      }
     },
     createGroup: function () {
-      wx.navigateTo({
-        url: '../group/create/index'
-      });
+      if (this.isLogin) {
+        uni.navigateTo({
+          url: '../group/create/index'
+        });
+      } else {
+        uni.navigateTo({
+          url: '../account/loginreminder/index'
+        });
+      }
+    },
+    joinGroup: function () {
+      if (this.isLogin) {
+        uni.navigateTo({
+          url: '../group/join/index'
+        });
+      } else {
+        uni.navigateTo({
+          url: '../account/loginreminder/index'
+        });
+      }
     }
   }
 };
