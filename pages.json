@@ -103,6 +103,10 @@
     {
       "path": "pages/profile/qrcode/index",
       "style": {}
+    },
+    {
+      "path": "pages/customerIm/chatPage/index",
+      "style": {}
     }
   ],
   "tabBar": {
