@@ -28,7 +28,7 @@
             <text>你还没有添加好友，可以点击添加好友头像进行操作</text>
           </view>
         </view>
-        <view v-for="(item, index) in rosterList" :key="index" :data-uid="item.user_id" :data-nick="item.nick_name || item.username || item.user_id" class="item" @tap="goChat">
+        <view v-for="item in rosterList" :key="item.user_id" :data-uid="item.user_id" :data-nick="item.nick_name || item.username || item.user_id" class="item" @tap="goChat">
           <image :src="item.avatar" class="avatar"></image>
           <text class="uname">{{ item.nick_name || item.username || item.user_id }}</text>
         </view>
@@ -51,7 +51,7 @@
             <text>你还没有加入群组，可以点击创建群组头像进行操作</text>
           </view>
         </view>
-        <view v-for="(item, index) in groupList" :key="index" :data-gid="item.group_id" class="item" @tap="goGroup">
+        <view v-for="item in groupList" :key="item.group_id" :data-gid="item.group_id" class="item" @tap="goGroup">
           <image :src="item.avatar" class="avatar"></image>
           <text class="uname">{{ item.name }}</text>
         </view>
@@ -66,7 +66,7 @@
             <text>如果想联系技术支持,请退出后,将App ID切换成"welovemaxim"</text>
           </view>
         </view>
-        <view v-for="(item, index) in staticList" v-if="showsupports" :key="index" :data-uid="item.user_id" :data-nick="item.nickname" class="item" @tap="goChat">
+        <view v-for="item in staticList" v-if="showsupports" :key="item.user_id" :data-uid="item.user_id" :data-nick="item.nickname" class="item" @tap="goChat">
           <image :src="item.avatar" class="avatar"></image>
           <text class="uname">{{ item.nick_name || item.nickname || item.username }}</text>
         </view>
@@ -167,13 +167,13 @@ export default {
       var id = e.currentTarget.dataset.uid;
       const nick = e.currentTarget.dataset.nick;
       wx.navigateTo({
-        url: '../roster/index?uid=' + id + '&nick=' + nick
+        url: '../../pages_chat/roster/index?uid=' + id + '&nick=' + nick
       });
     },
     goGroup: function (e) {
       var gid = e.currentTarget.dataset.gid;
       wx.navigateTo({
-        url: '../group/index?gid=' + gid
+        url: '../../pages_chat/group/index?gid=' + gid
       });
     },
 
@@ -264,7 +264,7 @@ export default {
     addRoster: function () {
       if (this.isLogin) {
         uni.navigateTo({
-          url: '../roster/add/index'
+          url: '../../pages_chat/roster/add/index'
         });
       } else {
         uni.navigateTo({
@@ -275,7 +275,7 @@ export default {
     createGroup: function () {
       if (this.isLogin) {
         uni.navigateTo({
-          url: '../group/create/index'
+          url: '../../pages_chat/group/create/index'
         });
       } else {
         uni.navigateTo({
@@ -286,7 +286,7 @@ export default {
     joinGroup: function () {
       if (this.isLogin) {
         uni.navigateTo({
-          url: '../group/join/index'
+          url: '../../pages_chat/group/join/index'
         });
       } else {
         uni.navigateTo({

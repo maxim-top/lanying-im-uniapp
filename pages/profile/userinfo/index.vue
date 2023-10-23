@@ -192,11 +192,11 @@ export default {
     goChat() {
       if (this.uid) {
         uni.navigateTo({
-          url: '/pages/roster/index?uid=' + this.uid
+          url: '/pages_chat/roster/index?uid=' + this.uid
         });
       } else {
         uni.navigateTo({
-          url: '/pages/group/index?gid=' + this.gid
+          url: '/pages_chat/group/index?gid=' + this.gid
         });
       }
     }

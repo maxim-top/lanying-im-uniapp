@@ -4,17 +4,19 @@
       <view class="back" @tap.stop="backClick">
         <image class="back_kmg" src="/static/pages/image/back.png"></image>
       </view>
-      <text class="title" @click="goGroupProfile()">{{ stitle }}</text>
+      <text class="title" @click="goUserProfile()">{{ stitle }}</text>
       <view class="delete_button">
         <image class="back_kmg" src="/static/pages/image/close_circle.png" :style="isWeChat ? 'padding-right:' + menuButtonWidth + 'px' : ''" @click="deleteConversation()"></image>
       </view>
     </snav>
-    <view class="history_button" @click="queryHistory()" :style="'top:' + hisbtnHeight + 'px'">查看历史</view>
+    <view class="history_button" @click="queryHistory()" :style="'top:' + hisbtnHeight + 'px'">{{ queryingHistory ? '正在拉取历史消息' : '查看历史' }}</view>
     <view class="container" :style="'padding-top:' + navHeight + 'px'">
       <scroll-view class="contentcontainer" :style="'height:' + wh + 'px'" scroll-y :scroll-top="scrolltop" @tap="hidenToolBarHandler">
-        <block v-for="(message, index) in messages" :key="index">
-          <message :message="message"></message>
-        </block>
+        <view v-if="showList">
+          <block v-for="message in messages" :key="message.id">
+            <message :message="message" ref="vMessages"></message>
+          </block>
+        </view>
       </scroll-view>
       <view class="inputer">
         <image class="voice" src="/static/pages/image/voice.png" @tap="voiceHandler"></image>
@@ -63,15 +65,18 @@
 <script>
 //index.js
 //获取应用实例
-import { toNumber, toLong } from '../../third/tools';
+import { toLong, toNumber } from '../../third/tools';
 import message from './message/index';
+var JSONBigString = require('json-bigint');
 
 export default {
   data() {
     return {
       messages: [],
-      gid: 0,
+      uid: 0,
       queryHistoryMessageId: 0,
+      queryingHistory: false,
+      showList: true,
       scrolltop: -1,
       inputValue: '',
       showing: false,
@@ -88,7 +93,8 @@ export default {
       duration: 0,
       timer: null,
       recordFile: '',
-      isWeChat: false
+      isWeChat: false,
+      scrollTimer: null
     };
   },
 
@@ -98,7 +104,7 @@ export default {
   props: {},
   onShow: function () {
     this.setData({
-      showing: false
+      showing: true
     });
   },
   onUnload: function () {
@@ -109,40 +115,48 @@ export default {
     const im = getApp().getIM();
     im &&
       im.off({
-        onGroupMessage: this.receiveNewMessage,
+        onRosterMessage: this.receiveNewMessage,
+        onRosterMessageContentAppend: this.receiveContentAppendedMessage,
+        onRosterMessageReplace: this.receiveReplaceMessage,
         onReceiveHistoryMsg: this.receiveHistoryMsg,
         onMessageStatusChanged: this.onMessageStatusChanged,
         onSendingMessageStatusChanged: this.onSendingMessageStatusChanged
       });
   },
   onLoad: function (options) {
-    const { gid } = options;
+    let { uid, nick = '' } = options;
     this.setData({
-      gid: gid - 0
+      uid: uid - 0
     });
+
     const im = getApp().getIM();
-    if (!im) return;
+    if (im) {
+      const messages = im.rosterManage.getRosterMessageByRid(uid - 0);
+      this.appendMessage({
+        messages
+      });
+      setTimeout(() => {
+        this.scroll();
+      }, 500);
+      im.on({
+        onRosterMessage: this.receiveNewMessage,
+        onRosterMessageContentAppend: this.receiveContentAppendedMessage,
+        onRosterMessageReplace: this.receiveReplaceMessage,
+        onReceiveHistoryMsg: this.receiveHistoryMsg,
+        onMessageStatusChanged: this.onMessageStatusChanged,
+        onSendingMessageStatusChanged: this.onSendingMessageStatusChanged
+      });
+    }
 
-    const messages = im.groupManage.getGruopMessage(gid - 0);
-    this.appendMessage({
-      messages
-    });
-    setTimeout(() => {
-      this.scroll();
-    }, 500);
-    im.on({
-      onGroupMessage: this.receiveNewMessage,
-      onReceiveHistoryMsg: this.receiveHistoryMsg,
-      onMessageStatusChanged: this.onMessageStatusChanged,
-      onSendingMessageStatusChanged: this.onSendingMessageStatusChanged
-    });
+    /** 设置title */
 
-    im.groupManage.readGroupMessage(this.gid);
-    const allGroupMap = im.groupManage.getAllGroupDetail();
-    const sgroup = allGroupMap[gid] || {};
+    const umaps = im.rosterManage.getAllRosterDetail();
+    let fromUserObj = umaps[uid] || { user_id: uid };
+    if (uid == 0) fromUserObj.username = '系统通知';
     this.setData({
-      stitle: sgroup.name || gid
+      stitle: nick || fromUserObj.nick_name || fromUserObj.username || fromUserObj.user_id
     });
+    const wh = uni.getSystemInfoSync().windowHeight - this.navHeight - 70;
     this.setData({
       navHeight: getApp().getNavHeight() + 25,
       hisbtnHeight: getApp().getNavHeight(),
@@ -156,6 +170,7 @@ export default {
   methods: {
     onMessageStatusChanged: ({ mid }) => {
       console.log('Message status changed, mid: ', mid);
+      //TODO: refresh page
     },
     onSendingMessageStatusChanged: ({ status, mid }) => {
       console.log('Sending Message status changed to ', status, ' mid: ', mid);
@@ -179,10 +194,12 @@ export default {
           i++;
           continue;
         }
-        const toUid = toNumber(newMeta.to);
-        if (toUid + '' !== this.gid + '') {
-          // 群消息 to 是 群 id。。
-          return; //group，to 必须是sid
+        const { from, to } = newMeta;
+        const fromUid = toNumber(from);
+        const toUid = toNumber(to);
+        let saveUid = fromUid === uid ? toUid : fromUid;
+        if (saveUid + '' !== this.uid + '') {
+          return; // rosterchat, 必须有一个id是 sid
         }
 
         const oldMeta = oldMessages[j];
@@ -211,39 +228,109 @@ export default {
       this.setData({
         messages: [].concat(allMessages)
       });
-      this.scroll();
     },
 
     receiveNewMessage(message) {
       const im = getApp().getIM();
-      const to = message.to;
-      const pid = this.gid;
+      if (!im) return;
 
-      if (pid == to) {
+      const uid = im.userManage.getUid();
+      const to = message.to;
+      const from = message.from;
+      const pid = this.uid;
+
+      if ((uid == to && from == pid) || (uid == from && to == pid)) {
         if (!this.checkTyping(message)) {
-          // const smessages = im.groupManage.getGruopMessage(pid - 0);
+          // we might reload all messages because of message operations, which could be message deletion;
+          // const smessages = im.rosterManage.getRosterMessageByRid(this.uid - 0);
+          // console.log('Got: ', message);
           this.appendMessage({ messages: [message] });
-          this.scroll();
+          if (message.ext) {
+            let ext = JSONBigString.parse(message.ext);
+            if (ext && ext.ai && ext.ai.stream && !ext.ai.finish) {
+              this.calculateScroll(message);
+            } else {
+              this.scroll();
+            }
+          } else {
+            this.scroll();
+          }
         }
       }
 
-      if (this.showing && im) {
-        im.groupManage.readGroupMessage(this.gid);
+      if (this.showing && from !== uid) {
+        //do not read message sent by oneself
+        im.rosterManage.readRosterMessage(this.uid, message.id);
+      }
+    },
+
+    calculateScroll(message) {
+      if (message.ext) {
+        let that = this;
+        let ext = JSONBigString.parse(message.ext);
+        if (ext && ext.ai && ext.ai.stream) {
+          this.scrollTimer && clearInterval(this.scrollTimer);
+          let count = ext.ai.stream_interval * 5;
+          let start = 0;
+          if (ext.ai.seq) {
+            start = ext.ai.seq * 10;
+          }
+          if (count) {
+            let scrollTimer = setInterval(() => {
+              that.scroll(start++);
+              if (count-- <= 0) {
+                clearInterval(that.scrollTimer);
+                that.setData({
+                  scrollTimer
+                });
+              }
+            }, 200);
+            this.setData({
+              scrollTimer
+            });
+          }
+        }
+      }
+    },
+
+    receiveContentAppendedMessage(message) {
+      this.calculateScroll(message);
+      let msg = this.$refs.vMessages.reverse().find((item) => item.message.id == message.id);
+      if (msg) {
+        msg.messageContentAppend(message);
+      }
+    },
+
+    receiveReplaceMessage(message) {
+      this.calculateScroll(message);
+      let msg = this.$refs.vMessages.reverse().find((item) => item.message.id == message.id);
+      if (msg) {
+        msg.messageReplace(message);
       }
     },
 
     receiveHistoryMsg({ next }) {
-      this.setData({ queryHistoryMessageId: next });
+      let that = this;
+      this.setData({
+        queryHistoryMessageId: next,
+        queryingHistory: false,
+        showList: false
+      });
+      this.$nextTick(() => {
+        that.setData({
+          showList: true
+        });
+      });
       this.scroll();
     },
 
     checkTyping(message) {
       const { ext } = message;
+
       let s = {};
       try {
         s = JSON.parse(ext);
       } catch (ex) {}
-
       if (typeof s.input_status !== 'undefined') {
         let status = s.input_status;
 
@@ -253,15 +340,13 @@ export default {
           // this.header.querySelector(".typing").style.display = "inline";
           // this.header.querySelector(".typing").innerHTML = status + "...";
         }
-
         return true;
       }
-
       return false;
     },
 
-    scroll() {
-      const scrolltop = this.messages.length * 1000;
+    scroll(count = 0) {
+      const scrolltop = this.messages.length * 1000 + count;
       this.setData({
         scrolltop
       });
@@ -271,9 +356,9 @@ export default {
       const content = this.inputValue;
 
       if (content) {
-        getApp().getIM().sysManage.sendGroupMessage({
+        getApp().getIM().sysManage.sendRosterMessage({
           content,
-          gid: this.gid
+          uid: this.uid
           // ext: "自定义消息字段",
         });
         setTimeout(() => {
@@ -301,9 +386,9 @@ export default {
       }
     },
 
-    goGroupProfile() {
+    goUserProfile() {
       uni.navigateTo({
-        url: '/pages/profile/userinfo/index?gid=' + this.gid
+        url: '/pages/profile/userinfo/index?uid=' + this.uid
       });
     },
 
@@ -311,9 +396,25 @@ export default {
       const im = getApp().getIM();
       if (!im) return;
 
-      const mid = this.queryHistoryMessageId; // Query historys older than the message with id:mid, 0 means from the last message;
+      let that = this;
+      if (this.queryingHistory) {
+        return;
+      }
+
+      this.setData({
+        queryingHistory: true
+      });
+
+      setTimeout(() => {
+        that.setData({
+          queryingHistory: false
+        });
+      }, 10000);
+
+      // Query historys older than the message with id:mid, 0 means from the last message;
+      const mid = this.queryHistoryMessageId;
       const amount = 20; // Batch size of one time history message query.
-      im.sysManage.requireHistoryMessage(this.gid, mid, amount);
+      im.sysManage.requireHistoryMessage(this.uid, mid, amount);
     },
 
     deleteConversation() {
@@ -324,7 +425,7 @@ export default {
         success: function (res) {
           if (res.confirm) {
             const also_delete_other_devices = true;
-            getApp().getIM().sysManage.deleteConversation(that.gid, also_delete_other_devices);
+            getApp().getIM().sysManage.deleteConversation(that.uid, also_delete_other_devices);
             that.backClick();
           } else if (res.cancel) {
             // do nothing here.
@@ -414,8 +515,8 @@ export default {
         type: 'wgs84',
         success(res) {
           const im = getApp().getIM();
-          im.sysManage.sendGroupMessage({
-            gid: that.gid,
+          im.sysManage.sendRosterMessage({
+            uid: that.uid,
             type: 'location',
             content: '',
             attachment: {
@@ -447,10 +548,10 @@ export default {
       im.sysManage
         .asyncFileUpload({
           file: file.tempFilePath ? file.tempFilePath : file.path,
-          to_id: this.gid,
+          to_id: this.uid,
           fileType: type,
           toType: 'chat',
-          chatType: 'group'
+          chatType: 'roster'
         })
         .then((res) => {
           console.log('文件操作上传成功');
@@ -473,9 +574,9 @@ export default {
       if (type === 'video') {
         fileInfo.tUrl = url + '&image_type=3';
       }
-      im.sysManage.sendGroupMessage({
+      im.sysManage.sendRosterMessage({
         type: type,
-        gid: this.gid,
+        uid: this.uid,
         content: '',
         attachment: fileInfo
       });
@@ -544,10 +645,10 @@ export default {
       im.sysManage
         .asyncFileUpload({
           file: path,
-          to_id: this.gid,
+          to_id: this.uid,
           fileType: 'audio-mp3',
           toType: 'chat',
-          chatType: 'group'
+          chatType: 'roster'
         })
         .then((res) => {
           console.log('录音上传成功');
@@ -565,9 +666,9 @@ export default {
         url,
         duration: this.duration
       };
-      im.sysManage.sendGroupMessage({
+      im.sysManage.sendRosterMessage({
         type: 'audio',
-        gid: this.gid,
+        uid: this.uid,
         content: '',
         attachment: fileInfo
       });

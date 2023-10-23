@@ -13,7 +13,7 @@
           <text>你没有聊天会话，可以在联系人页面下操作添加好友或创建群组</text>
         </view>
       </view>
-      <view v-for="(conversation, index) in conversationList" :key="index" @tap="touchConversation" :data-type="conversation.type" :data-sid="conversation.sid" class="item">
+      <view v-for="conversation in conversationList" :key="conversation.sid" @tap="touchConversation" :data-type="conversation.type" :data-sid="conversation.sid" class="item">
         <view v-if="conversation.unread != 0" class="unread_number">
           <text>{{ conversation.unread }}</text>
         </view>
@@ -45,7 +45,6 @@ export default {
       conversationList: [],
       navHeight: 0,
       isLogin: false,
-      isRelaunch: false,
       system_avatar: {
         name: '系统通知',
         avatar: '/static/pages/image/tab/setting.png'
@@ -56,34 +55,25 @@ export default {
   components: {},
   props: {},
   onShow: function () {
-    if (this.isRelaunch) {
-      this.setData({
-        isRelaunch: false
-      });
-      uni.reLaunch({
-        url: '../conversation/index'
-      });
-    } else {
-      const isLogin = getApp().isIMLogin();
+    const isLogin = getApp().isIMLogin();
 
-      this.setData({
-        isLogin
-      });
+    this.setData({
+      isLogin
+    });
 
-      if (!isLogin) {
-        this.setData({
-          conversationList: []
+    if (!isLogin) {
+      this.setData({
+        conversationList: []
+      });
+      if (getApp().isLoginPage === false) {
+        getApp().isLoginPage = true;
+        const isWeChat = getApp().isWeChatEnvironment();
+        uni.reLaunch({
+          url: isWeChat ? '../profile/index' : '../login/index'
         });
-        if (getApp().isLoginPage === false) {
-          getApp().isLoginPage = true;
-          const isWeChat = getApp().isWeChatEnvironment();
-          uni.reLaunch({
-            url: isWeChat ? '../profile/index' : '../login/index'
-          });
-        }
-      } else {
-        this.getConversationList();
       }
+    } else {
+      this.getConversationList();
     }
   },
   onLoad: function () {
@@ -109,11 +99,6 @@ export default {
       im.on('onRosterListUpdate', (message) => {
         this.getConversationList();
       });
-      im.on('onReceiveHistoryMsg', () => {
-        this.setData({
-          isRelaunch: true
-        });
-      });
 
       im.on('onDisconnect', () => {
         // im.userManage.deleteToken();
@@ -133,11 +118,11 @@ export default {
 
       if (type === 'roster') {
         wx.navigateTo({
-          url: '../roster/index?uid=' + id
+          url: '../../pages_chat/roster/index?uid=' + id
         });
       } else {
         wx.navigateTo({
-          url: '../group/index?gid=' + id
+          url: '../../pages_chat/group/index?gid=' + id
         });
       }
     },

@@ -15,17 +15,8 @@
   border-radius: 36rpx;
 }
 
-.rosterInfo .username {
-  color: #000;
-  font-size: 28rpx;
-  margin-top: 10rpx;
-  height: 50rpx;
-  line-height: 50rpx;
-  padding-left: 10rpx;
-}
-
 .msgcontainer .c_content {
-  max-width: 66.6%;
+  max-width: 60%;
   border-radius: 10rpx;
   padding: 25rpx 20rpx;
   line-height: 40rpx;
@@ -35,14 +26,7 @@
 .self .rosterInfo {
   float: right;
 }
-
-.self .rosterContent {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.self .rosterContent .c_content {
+.self .c_content {
   float: right;
   background: rgb(155, 200, 255);
   margin-right: 35rpx;
@@ -54,26 +38,7 @@
 .roster .rosterInfo {
   float: left;
 }
-
-.roster .rosterContent {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.roster .rosterContent .name_frame {
-  float: left;
-  margin-left: 45rpx;
-  color: rgb(145, 145, 145);
-  font-size: 20rpx;
-  margin-bottom: 5rpx;
-  max-width: 33.3%;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.roster .rosterContent .c_content {
+.roster .c_content {
   float: left;
   border: 1px solid rgb(240, 240, 240);
   margin-left: 35rpx;
@@ -82,8 +47,43 @@
   white-space: normal;
 }
 
+.roster .c_content_all {
+  display: flex;
+  align-items: flex-end;
+  max-width: calc(100% - 72rpx);
+}
+
+.self .c_content_all {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-end;
+  max-width: calc(100% - 72rpx);
+}
+
+.c_content_ext {
+  color: gray;
+}
+
+.c_content_more {
+  display: flex;
+  flex-direction: column;
+}
+
+.c_ext_title {
+  color: rgb(180, 180, 180);
+  border-radius: 20px 20px 20px 20px;
+  background-color: rgb(230, 230, 230);
+  font-size: 24rpx;
+  min-width: 120rpx;
+  max-width: 120rpx;
+  text-align: center;
+  margin-left: 10rpx;
+  margin-right: 10rpx;
+  margin-bottom: 10rpx;
+}
+
 .c_content .cimage {
-  max-width: 400rpx;
+  max-width: 370rpx;
   max-height: 300rpx;
 }
 .time {
@@ -120,7 +120,6 @@
 .voice_frmae {
   overflow: hidden;
 }
-
 .voice_frmae .voice {
   width: 50rpx;
   height: 50rpx;

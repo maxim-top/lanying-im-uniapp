@@ -25,38 +25,6 @@
       "style": {}
     },
     {
-      "path": "pages/roster/index",
-      "style": {}
-    },
-    {
-      "path": "pages/roster/message/index",
-      "style": {
-        "component": true
-      }
-    },
-    {
-      "path": "pages/roster/add/index",
-      "style": {}
-    },
-    {
-      "path": "pages/group/index",
-      "style": {}
-    },
-    {
-      "path": "pages/group/message/index",
-      "style": {
-        "component": true
-      }
-    },
-    {
-      "path": "pages/group/create/index",
-      "style": {}
-    },
-    {
-      "path": "pages/group/join/index",
-      "style": {}
-    },
-    {
       "path": "pages/contact/index",
       "style": {}
     },
@@ -93,6 +61,45 @@
       "style": {}
     }
   ],
+  "subPackages": [
+    {
+      "root": "pages_chat",
+      "pages": [
+        {
+          "path": "roster/index",
+          "style": {}
+        },
+        {
+          "path": "roster/message/index",
+          "style": {
+            "component": true
+          }
+        },
+        {
+          "path": "roster/add/index",
+          "style": {}
+        },
+        {
+          "path": "group/index",
+          "style": {}
+        },
+        {
+          "path": "group/message/index",
+          "style": {
+            "component": true
+          }
+        },
+        {
+          "path": "group/create/index",
+          "style": {}
+        },
+        {
+          "path": "group/join/index",
+          "style": {}
+        }
+      ]
+    }
+  ],
   "tabBar": {
     "color": "#9B9BA9",
     "selectedColor": "#333333",
@@ -125,6 +132,5 @@
     "navigationBarTitleText": "",
     "navigationBarTextStyle": "black",
     "navigationStyle": "custom"
-  },
-  "subPackages": []
+  }
 }
