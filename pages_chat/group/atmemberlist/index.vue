@@ -5,7 +5,12 @@
         <image class="back_kmg" src="/static/pages/image/back.png"></image>
       </view>
       <view class="multi_check_button">
-        <image class="back_kmg" src="/static/pages/image/multi_check.png" :style="isWeChat ? 'padding-right:' + menuButtonWidth + 'px' : ''" @click="multiCheck()"></image>
+        <image
+          class="back_kmg"
+          :src="hasSelectMember ? '/static/pages/image/multi_check_ok.png' : '/static/pages/image/multi_check.png'"
+          :style="isWeChat ? 'padding-right:' + menuButtonWidth + 'px' : ''"
+          @click="multiCheck()"
+        ></image>
       </view>
     </snav>
     <view class="container" :style="'padding-top:' + navHeight + 'px'">
@@ -30,7 +35,8 @@ export default {
       atMemberList: [],
       navHeight: 0,
       menuButtonWidth: 0,
-      isWeChat: false
+      isWeChat: false,
+      hasSelectMember: false
     };
   },
 
@@ -90,6 +96,13 @@ export default {
       list[idx] = obj;
       this.setData({
         memberList: list
+      });
+
+      let selectMembers = this.memberList.filter((item) => {
+        return item.flag === true;
+      });
+      this.setData({
+        hasSelectMember: selectMembers.length > 0
       });
     },
 
